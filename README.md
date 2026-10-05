@@ -5,13 +5,16 @@
 ## 内容组织
 
 ```
-gaokao/
+（仓库根目录）/
 ├── index.html              # 落地页（GitHub Pages 首页，按科目列出材料）
 ├── README.md               # 本说明
 ├── .nojekyll               # 关闭 Jekyll，保证文件原样托管
-└── 物理/
-    ├── 3.1 运动学复习讲解-课件.html
-    └── images/             # 课件引用的图片
+├── 物理/
+│   ├── 3.1 运动学复习讲解-课件.html
+│   └── images/             # 课件引用的图片
+└── 化学/
+    ├── 化学三大基本观念-课件.html
+    └── 讲稿.md
 ```
 
 - 每个科目一个顶层目录（物理 / 数学 / 化学 …）
@@ -22,7 +25,7 @@ gaokao/
 
 发布会自动生成 GitHub Pages 地址（仓库 Settings → Pages，来源 `main` 分支根目录）：
 
-> https://na57.github.io/gaokao/
+> https://nagu.cc/
 
 ## 本地预览
 
