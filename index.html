@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>高考备考材料库</title>
 <style>
-  :root{ --bg:#f7f8fa; --card:#fff; --accent:#2563eb; --text:#1f2937; --muted:#6b7280; }
+  :root{ --bg:#f7f8fa; --card:#fff; --accent:#2563eb; --pink:#fb7299; --text:#1f2937; --muted:#6b7280; }
   *{ box-sizing:border-box; }
   body{ margin:0; font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg); color:var(--text); line-height:1.7; }
   header{ background:linear-gradient(135deg,#1e3a8a,#2563eb); color:#fff; padding:48px 20px; text-align:center; }
@@ -17,10 +17,17 @@
   .intro p{ margin:6px 0; color:var(--muted); font-size:15px; }
   .subject{ margin-bottom:24px; }
   .subject h3{ font-size:20px; border-left:4px solid var(--accent); padding-left:10px; margin:0 0 12px; }
-  .item{ display:block; background:var(--card); border:1px solid #e5e7eb; border-radius:10px; padding:16px 18px; margin-bottom:12px; text-decoration:none; color:var(--text); transition:.15s; box-shadow:0 1px 3px rgba(0,0,0,.05); }
-  .item:hover{ border-color:var(--accent); transform:translateY(-2px); box-shadow:0 4px 12px rgba(37,99,235,.15); }
-  .item .t{ font-size:17px; font-weight:600; color:var(--accent); }
-  .item .d{ font-size:14px; color:var(--muted); margin-top:4px; }
+  .item{ background:var(--card); border:1px solid #e5e7eb; border-radius:10px; padding:16px 18px; margin-bottom:12px; box-shadow:0 1px 3px rgba(0,0,0,.05); transition:.15s; }
+  .item:hover{ border-color:var(--accent); box-shadow:0 4px 12px rgba(37,99,235,.12); }
+  .item .t{ font-size:17px; font-weight:600; color:var(--text); }
+  .item .d{ font-size:14px; color:var(--muted); margin:6px 0 14px; }
+  .actions{ display:flex; gap:12px; flex-wrap:wrap; }
+  .btn{ flex:1 1 200px; min-width:180px; text-align:center; padding:11px 14px; border-radius:8px; font-size:15px; font-weight:600; text-decoration:none; transition:.15s; }
+  .btn .sub{ display:block; font-size:12px; font-weight:400; margin-top:2px; opacity:.9; }
+  .btn-video{ background:var(--pink); color:#fff; }
+  .btn-video:hover{ filter:brightness(1.06); }
+  .btn-ppt{ background:var(--accent); color:#fff; }
+  .btn-ppt:hover{ filter:brightness(1.08); }
   footer{ text-align:center; color:var(--muted); font-size:13px; padding:20px; }
   footer a{ color:var(--accent); text-decoration:none; }
 </style>
@@ -33,16 +40,28 @@
 <main>
   <section class="intro">
     <h2>关于本库</h2>
-    <p>这里汇集高中阶段各科目的复习讲解材料，以「可自学、能深究」为目标：既有系统梳理的图文课件，也有带配音与字幕的讲解视频指引。</p>
-    <p>材料按 <b>科目 → 专题</b> 组织，持续更新。建议配合纸笔，跟着推导与例题动手算一遍。</p>
+    <p>这里汇集高中阶段各科目的复习讲解材料，以「可自学、能深究」为目标。每个专题都提供两种学习方式，你可以任选：</p>
+    <p>• <b>讲解视频</b>——带配音与字幕，边听边看推导，多处设「暂停推导」互动，建议准备纸笔跟着算；<br>
+       • <b>图文课件</b>——可翻页自学的网页版 PPT，适合反复回看与做笔记。</p>
+    <p>材料按 <b>科目 → 专题</b> 组织，持续更新。</p>
   </section>
 
   <section class="subject">
     <h3>物理</h3>
-    <a class="item" href="物理/3.1 运动学复习讲解-课件.html">
+    <div class="item">
       <div class="t">3.1 运动学复习讲解（匀变速直线运动）</div>
-      <div class="d">33 页图文课件：核心概念、三个基本公式与三个推论的推导、x-t/v-t 图像、追及相遇、高频易错点。可翻页自学，配套讲解视频见 B 站 / 视频号。</div>
-    </a>
+      <div class="d">核心概念、三个基本公式与三个推论的推导、x-t/v-t 图像、追及相遇、高频易错点。约 18 分钟讲解，配套 33 页图文课件。建议二选一或搭配使用。</div>
+      <div class="actions">
+        <a class="btn btn-video" href="https://www.bilibili.com/video/BV1ctHW6ZEHS?vd_source=9627bcb8f6c60c10a3fe16123cca1997" target="_blank" rel="noopener">
+          观看讲解视频
+          <span class="sub">B 站 · 约 18 分钟 · 含字幕</span>
+        </a>
+        <a class="btn btn-ppt" href="物理/3.1 运动学复习讲解-课件.html">
+          查看图文课件
+          <span class="sub">网页版 PPT · 可翻页自学</span>
+        </a>
+      </div>
+    </div>
   </section>
 
   <footer>
