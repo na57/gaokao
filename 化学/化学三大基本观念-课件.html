@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>化学三大基本观念 · PPT</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
+<style>
+
+:root{
+  --ink:#1f2937; --sub:#6b7280; --line:#e5e7eb;
+  --wei:#4f46e5; --fen:#0d9488; --shou:#ea580c;
+  --bg:#ffffff; --accent:#4f46e5;
+}
+*{box-sizing:border-box;}
+body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;color:var(--ink);}
+.lead{font-size:1.25em;color:var(--sub);margin:.2em 0 .8em;}
+.note{margin-top:1em;padding:.7em 1em;background:#f5f3ff;border-left:4px solid var(--accent);border-radius:6px;color:#4338ca;font-size:.95em;}
+.bad{color:#dc2626;}
+.ok{color:#16a34a;font-weight:700;}
+ul.q{list-style:none;padding-left:0;}
+ul.q li{padding:.45em 0 .45em 1.4em;position:relative;border-bottom:1px dashed var(--line);}
+ul.q li:before{content:"▸";position:absolute;left:0;color:var(--accent);}
+.eq{font-family:"SF Mono",Menlo,Consolas,monospace;background:#0f172a;color:#e2e8f0;padding:.9em 1.1em;border-radius:8px;line-height:1.8;font-size:1.02em;}
+table.tbl{border-collapse:collapse;width:100%;margin:.6em 0;font-size:.92em;}
+table.tbl th,table.tbl td{border:1px solid var(--line);padding:.6em .8em;text-align:left;vertical-align:top;}
+table.tbl th{background:#eef2ff;color:#3730a3;}
+table.tbl tr:nth-child(even) td{background:#fafafa;}
+.three{display:flex;gap:1.2em;justify-content:center;margin:1.4em 0;}
+.card{flex:1;border-radius:12px;padding:1.1em;color:#fff;min-height:160px;}
+.card .tag{display:inline-block;font-size:.8em;background:rgba(255,255,255,.25);padding:.15em .7em;border-radius:99px;}
+.card .c-title{font-size:1.8em;font-weight:800;margin:.3em 0;}
+.card p{font-size:.95em;opacity:.95;}
+.c-wei{background:linear-gradient(135deg,#6366f1,#4f46e5);}
+.c-fen{background:linear-gradient(135deg,#14b8a6,#0d9488);}
+.c-shou{background:linear-gradient(135deg,#fb923c,#ea580c);}
+.mermaid{margin:.4em auto;max-width:880px;width:100%;}
+.mermaid svg{width:100%;height:auto;max-width:none !important;}
+
+.reveal{font-size:30px;}
+.reveal h1{font-size:2.4em;color:#fff;}
+.reveal h2{color:#3730a3;border-bottom:3px solid #4f46e5;padding-bottom:.2em;}
+.reveal .sec{color:#fff;border:none;text-align:center;font-size:2em;}
+.reveal .slide-sub{color:#6b7280;font-size:.7em;margin-top:-.3em;}
+.reveal .cover-sub{color:rgba(255,255,255,.9);font-size:1.1em;margin-top:.6em;}
+.reveal section{text-align:left;padding:0 1.2em;}
+.reveal .cover{text-align:center;}
+.reveal .cover h1{text-align:center;}
+.reveal .mermaid svg{max-height:46vh;}
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+<section class="cover" data-background-gradient="linear-gradient(135deg,#4f46e5,#0d9488)">
+  <h1>化学三大基本观念</h1>
+  <p class="cover-sub">微粒观 · 守恒观 · 分类观　｜　高中生通用版</p>
+</section>
+<section>
+  <h2>写在前面：三个经典困惑</h2>
+  
+  
+        <p class="lead">先问三个几乎人人都卡过的问题：</p>
+        <ul class="q">
+          <li>液态氯化氢不导电，为什么它的水溶液 <b>盐酸</b> 就能导电？</li>
+          <li>离子方程式两边相同的系数，为什么 <b>不能约分</b>？</li>
+          <li>硫酸钡明明难溶，为什么还说它是 <b>强电解质</b>？</li>
+        </ul>
+        <p class="note">这三个问题，本质上都是三大观念的问题。这节课，我们就把这三根柱子立起来。</p>
+        
+</section>
+<section>
+  <h2 class="sec">三大观念，各管一件事</h2>
+  
+        <div class="three">
+          <div class="card c-wei"><div class="tag">微粒观</div><div class="c-title">为什么</div><p>从微观粒子的角度，解释物质的性质和变化。</p></div>
+          <div class="card c-fen"><div class="tag">分类观</div><div class="c-title">是什么</div><p>把物质和反应归类，掌握同类规律。</p></div>
+          <div class="card c-shou"><div class="tag">守恒观</div><div class="c-title">有多少</div><p>定量分析反应中的数量关系。</p></div>
+        </div>
+        <p class="note">三者结合，就是化学完整的思维方式。</p>
+        
+</section>
+<section>
+  <h2>第一大观念：微粒观</h2>
+  <p class="slide-sub">看到宏观现象，要想到微观粒子在干什么</p>
+  
+        <div class="mermaid">
+        graph LR
+            subgraph M["宏观现象"]
+                M1["水结冰"]
+                M2["铁生锈"]
+                M3["盐水导电"]
+            end
+            subgraph N["微观本质"]
+                N1["水分子排列：无序 → 有序"]
+                N2["铁原子 + 氧原子：结合成新物质"]
+                N3["Na⁺、Cl⁻：在溶液中自由移动"]
+            end
+            M1 --> N1
+            M2 --> N2
+            M3 --> N3
+        </div>
+        
+</section>
+<section>
+  <h2>微粒观 · 物质由什么微粒构成</h2>
+  
+  
+        <table class="tbl">
+          <tr><th>物质类别</th><th>构成粒子</th><th>举例</th></tr>
+          <tr><td>由分子构成</td><td>分子</td><td>水 H₂O、氧气 O₂、氯化氢 HCl、二氧化碳 CO₂</td></tr>
+          <tr><td>由原子构成</td><td>原子</td><td>金属铁 Fe、金刚石 C、稀有气体 He</td></tr>
+          <tr><td>由离子构成</td><td>阳离子 + 阴离子</td><td>氯化钠 Na⁺Cl⁻、氢氧化钠 Na⁺OH⁻</td></tr>
+        </table>
+        <p class="note">关键认知：物质不是一坨东西，而是由特定小零件组装起来的。零件不同、组装方式不同，性质就不同。</p>
+        
+</section>
+<section>
+  <h2>微粒观 · 液态 HCl vs 盐酸（最经典考点）</h2>
+  
+  
+        <div class="mermaid">
+        graph TB
+            subgraph S1["液态HCl 纯净物"]
+                L1["只有 HCl 分子<br/>没有自由移动的离子"] --> L2["不能导电"]
+            end
+            subgraph S2["盐酸 HCl 的水溶液"]
+                W1["水分子把 H-Cl 共价键拆开<br/>电离出 H⁺ 和 Cl⁻"] --> W2["有自由移动的离子<br/>能导电"]
+            end
+            S1 ==>|溶于水| S2
+        </div>
+        <p class="note">状态不同 → 粒子存在形式不同 → 性质不同。一字之差，天壤之别。</p>
+        
+</section>
+<section>
+  <h2>微粒观 · 电离条件因物而异</h2>
+  
+  
+        <table class="tbl">
+          <tr><th>物质类型</th><th>构成</th><th>熔融态（液态纯净物）</th><th>水溶液</th></tr>
+          <tr><td>离子化合物<br/>如 NaCl</td><td>离子</td><td>能电离，能导电</td><td>能电离，能导电</td></tr>
+          <tr><td>共价化合物<br/>如 HCl</td><td>分子</td><td>不能电离，不导电</td><td>能电离，能导电</td></tr>
+        </table>
+        <p class="note">记忆窍门：离子化合物天生就是离子，熔融后自由了就能导电；共价化合物天生是分子，只有被水拆开才变离子。</p>
+        
+</section>
+<section>
+  <h2>第二大观念：守恒观</h2>
+  <p class="slide-sub">化学反应，是原子的重新排列组合</p>
+  
+        <div class="mermaid">
+        graph TD
+            A[化学反应] --> B[原子重新组合]
+            A --> C[电荷重新分配]
+            B --> D[原子守恒 种类和数目不变]
+            D --> E[质量守恒 总质量不变]
+            C --> F[电荷守恒 总电荷数不变]
+        </div>
+        <p class="note">最基本的守恒有两个：原子守恒、电荷守恒。写方程式必须同时满足。</p>
+        
+</section>
+<section>
+  <h2>守恒观 · 原子守恒是基石</h2>
+  
+  
+        <div class="mermaid">
+        graph TD
+            subgraph R["反应前"]
+                R1["2个 H₂ + 1个 O₂"]
+                R2["原子：H×4、O×2"]
+                R1 --> R2
+            end
+            subgraph P["反应后"]
+                P1["2个 H₂O"]
+                P2["原子：H×4、O×2"]
+                P1 --> P2
+            end
+            R2 -->|原子重新组合| P1
+        </div>
+        <p class="note">反应不是无中生有，也不是凭空消失，而是原子搬家重组。配平，就是在体现原子守恒。</p>
+        
+</section>
+<section>
+  <h2>守恒观 · 电荷也要守恒</h2>
+  
+  
+        <p class="lead">离子反应，除了原子守恒，<b>电荷也要守恒</b>。</p>
+        <div class="eq">Zn + Cu<sup>2+</sup> → Zn<sup>2+</sup> + Cu</div>
+        <ul class="q">
+          <li>反应前：Zn 为 0 价，Cu<sup>2+</sup> 带 +2 → 总电荷 <b>+2</b></li>
+          <li>反应后：Zn<sup>2+</sup> 带 +2，Cu 为 0 价 → 总电荷 <b>+2</b></li>
+          <li class="ok">✅ 电荷守恒！</li>
+        </ul>
+        <p class="note">检查离子方程式，原子和电荷这两条都要查。</p>
+        
+</section>
+<section>
+  <h2>守恒观 · 离子方程式为什么不能部分约分</h2>
+  
+  
+        <p class="lead">完整式：2H⁺ + SO₄²⁻ + Ba²⁺ + 2OH⁻ → BaSO₄↓ + 2H₂O</p>
+        <p>有人想把两边的 2 约掉？<b class="bad">绝对不行 ❌</b></p>
+        <ul class="q">
+          <li>① 原子守恒：约分后 H 前 1 后 2 → <b class="bad">H 原子不守恒</b></li>
+          <li>② 电荷守恒：约分后恰好还是 0 → 但原子已错</li>
+        </ul>
+        <p class="note">离子方程式的系数代表实际参与反应的离子个数比，由物质组成决定，不是想约就约的——就像食谱里 2 个鸡蛋配 1 杯面粉，不能把鸡蛋约成 1 个。</p>
+        
+</section>
+<section>
+  <h2>守恒观 · 解题威力：电荷守恒算 SO₄²⁻</h2>
+  
+  
+        <p class="lead">溶液含 Na⁺ 0.2 mol、Mg²⁺ 0.25 mol、Cl⁻ 0.4 mol，求 SO₄²⁻？</p>
+        <div class="eq">正电荷 = 0.2×1 + 0.25×2 = 0.7<br/>负电荷 = 0.4×1 + 2x<br/>0.7 = 0.4 + 2x → <b>x = 0.15 mol</b></div>
+        <p class="note">溶液电中性：正电荷总数 = 负电荷总数。靠守恒，一步到位。</p>
+        
+</section>
+<section>
+  <h2>第三大观念：分类观</h2>
+  <p class="slide-sub">学会分类，举一反三，事半功倍</p>
+  
+        <div class="mermaid">
+        graph TD
+            Root((物质分类))
+            Root --> A1[按组成分]
+            A1 --> A2[纯净物]
+            A1 --> A3[混合物]
+            A2 --> A4[单质]
+            A2 --> A5[化合物]
+            A5 --> A6[氧化物 / 酸 / 碱 / 盐]
+            Root --> B1[按导电性分]
+            B1 --> B2[电解质]
+            B1 --> B3[非电解质]
+            Root --> C1[按化学键分]
+            C1 --> C2[离子化合物]
+            C1 --> C3[共价化合物]
+        </div>
+        
+</section>
+<section>
+  <h2>分类观 · 同类相似 + 电解质判别</h2>
+  
+  
+        <div class="mermaid">
+        graph TD
+            A[化合物] --> B[电解质]
+            A --> C[非电解质]
+            B --> B1[水溶液或熔融态能导电]
+            B --> B2[酸 碱 盐 活泼金属氧化物 水]
+            C --> C1[两种情况都不能导电]
+            C --> C2[蔗糖 酒精 大多数有机物 非金属氧化物]
+        </div>
+        <p class="note">判断电解质的关键：<b>物质本身能否电离出离子</b>。自己能电离→电解质；和水反应后产物能电离→非电解质。</p>
+        
+</section>
+<section>
+  <h2>三大观念之间的联系</h2>
+  
+  
+        <div class="mermaid">
+        graph TD
+            A[微粒观] -->|解释本质| B[为什么会这样]
+            C[分类观] -->|归纳规律| D[有什么共性]
+            E[守恒观] -->|定量分析| F[数量关系如何]
+            B --> G[学好化学]
+            D --> G
+            F --> G
+        </div>
+        <p class="note">三大观念不是孤立的。高一没立稳这三根柱子，高二高三就只能在题海里打补丁。</p>
+        
+</section>
+<section>
+  <h2>三大观念在高中三年的「延长线」</h2>
+  
+  
+        <table class="tbl">
+          <tr><th>观念</th><th>高一（必修）</th><th>高二（选必）</th><th>高三（复习）</th></tr>
+          <tr><td>微粒观</td><td>构成微粒、电离、离子反应</td><td>碰撞理论、电离平衡、盐类水解</td><td>微观图像、粒子浓度比较、晶胞</td></tr>
+          <tr><td>守恒观</td><td>方程式配平、电荷守恒</td><td>电子守恒、热化学、平衡三段式</td><td>守恒法速解</td></tr>
+          <tr><td>分类观</td><td>物质分类、反应类型</td><td>官能团与有机物分类</td><td>题型模板化、陌生信息归类</td></tr>
+        </table>
+        
+</section>
+<section>
+  <h2>巩固练习（答案要点）</h2>
+  
+  
+        <ul class="q">
+          <li>液态氯化氢为什么不能导电？<span class="ok">→ 只有分子，无自由离子</span></li>
+          <li>离子方程式为什么不能部分约分？<span class="ok">→ 会破坏原子守恒</span></li>
+          <li>BaSO₄ 为什么是强电解质？<span class="ok">→ 难溶但溶解部分完全电离，熔融也能导电</span></li>
+        </ul>
+        <p class="note">完整 10 道练习与解析见讲义。建议盖住答案先做，再对照是哪个观念没掌握。</p>
+        
+</section>
+<section class="cover" data-background-gradient="linear-gradient(135deg,#4f46e5,#0d9488)">
+  <h1>把三大观念变成肌肉记忆</h1>
+  <p class="cover-sub">微粒观让你看见微观 · 守恒观让你算清数量 · 分类观让你举一反三</p>
+</section>
+</div></div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script>
+  Reveal.initialize({hash:true, slideNumber:true, transition:'slide', controls:true, progress:true});
+  mermaid.initialize({startOnLoad:false, theme:'default', securityLevel:'loose', themeVariables:{fontSize:'18px',fontFamily:'PingFang SC, Microsoft YaHei, sans-serif'}});
+  function renderMermaid(slide){
+    if(!slide) return;
+    var m = slide.querySelector('.mermaid');
+    if(m && !m.querySelector('svg')){
+      try { mermaid.run({nodes:[m]}); } catch(e){ console.error('mermaid render error', e); }
+    }
+  }
+  Reveal.on('ready', function(e){ renderMermaid(e.currentSlide); });
+  Reveal.on('slidechanged', function(e){ renderMermaid(e.currentSlide); });
+</script>
+</body>
+</html>
