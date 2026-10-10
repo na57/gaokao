@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>病句修改系统讲解</title>
+<style>
+  :root{
+    --primary:#1d4ed8; --accent:#2563eb; --accent-light:#eff6ff; --accent-border:#bfdbfe;
+    --text:#1f2937; --muted:#6b7280; --border:#e5e7eb; --bg-light:#f9fafb;
+    --success:#16a34a; --danger:#dc2626; --warning:#d97706; --warn-bg:#fffbeb;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:100%;height:100%;overflow:hidden;background:#0f172a;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","WenQuanYi Micro Hei",sans-serif;
+    color:var(--text);
+  }
+  #stage{
+    position:absolute; left:50%; top:50%;
+    width:1280px; height:720px;
+    transform:translate(-50%,-50%) scale(1);
+    transform-origin:center center;
+    background:#ffffff;
+    box-shadow:0 0 40px rgba(0,0,0,.4);
+    overflow:hidden;
+  }
+  .slide{
+    position:absolute; inset:0;
+    padding:36px 60px 52px;
+    display:none;
+    flex-direction:column;
+    background:#ffffff;
+    opacity:0;
+    transition:opacity .35s ease;
+  }
+  .slide.active{ display:flex; opacity:1; }
+
+  #progress{ position:absolute; top:0; left:0; height:6px; background:var(--accent); width:0; z-index:50; transition:width .35s; }
+
+  .slide-cover, .slide-divider{ justify-content:center; align-items:center; text-align:center; }
+  .slide-cover{ background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 100%); color:#fff; }
+  .slide-cover .kicker{ font-size:22px; letter-spacing:6px; opacity:.85; margin-bottom:18px;}
+  .slide-cover h1{ font-size:62px; font-weight:800; line-height:1.2; margin-bottom:22px; letter-spacing:2px;}
+  .slide-cover .sub{ font-size:25px; opacity:.92; margin-bottom:34px;}
+  .slide-cover .divider{ width:160px;height:5px;background:#fff;opacity:.6;margin:0 auto 30px;border-radius:3px;}
+  .slide-cover .meta{ font-size:18px; opacity:.88; line-height:2;}
+
+  .slide-divider{ background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%); color:#fff;}
+  .slide-divider .num{ font-size:30px; opacity:.7; letter-spacing:4px; margin-bottom:10px;}
+  .slide-divider h2{ font-size:56px; font-weight:800; letter-spacing:3px;}
+  .slide-divider .en{ font-size:20px; opacity:.8; margin-top:16px; letter-spacing:2px;}
+
+  .slide-head{ display:flex; align-items:baseline; gap:16px; border-bottom:3px solid var(--accent); padding-bottom:9px; margin-bottom:12px;}
+  .slide-head .sec{ font-size:17px; color:#fff; font-weight:700; background:var(--accent); padding:3px 11px; border-radius:6px;}
+  .slide-head h3{ font-size:30px; color:var(--primary); font-weight:700;}
+  .slide-body{ flex:1; display:flex; flex-direction:column; justify-content:center; min-height:0; }
+
+  p{ font-size:21px; line-height:1.65; margin-bottom:8px; text-align:justify;}
+  .lead{ font-size:23px; color:#374151; line-height:1.75;}
+  ul,ol{ margin:0 0 8px 26px; font-size:21px; line-height:1.7;}
+  li{ margin-bottom:5px;}
+  strong{ color:var(--primary); }
+
+  table{ width:100%; border-collapse:collapse; margin:10px 0; font-size:19px;}
+  th{ background:var(--accent); color:#fff; padding:7px 12px; text-align:center; font-weight:600;}
+  td{ padding:7px 12px; border:1px solid var(--border); text-align:center; vertical-align:middle;}
+  tr:nth-child(even) td{ background:var(--bg-light);}
+
+  .card{ background:var(--accent-light); border:1px solid var(--accent-border); border-radius:12px; padding:12px 20px; margin:10px 0; font-size:20px;}
+  .tip{ background:#eff6ff; border-left:5px solid var(--accent); border-radius:0 10px 10px 0; padding:10px 20px; margin:10px 0; font-size:20px; color:#1e40af;}
+  .deep{ background:#f0fdf4; border-left:5px solid var(--success); border-radius:0 10px 10px 0; padding:10px 20px; margin:10px 0; font-size:20px; color:#166534;}
+
+  .cols{ display:flex; gap:28px; align-items:center; }
+  .col{ flex:1; }
+
+  .goals{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px 26px; margin-top:6px;}
+  .goal{ display:flex; gap:12px; align-items:flex-start; background:var(--accent-light); border:1px solid var(--accent-border); border-radius:12px; padding:11px 16px;}
+  .goal .no{ flex:none; width:30px; height:30px; border-radius:50%; background:var(--accent); color:#fff; font-weight:700; font-size:16px; display:flex; align-items:center; justify-content:center;}
+  .goal .t{ font-size:19px; color:var(--text); line-height:1.45;}
+  .goal .t b{ color:var(--primary); }
+
+  .typegrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:10px;}
+  .typecard{ background:var(--accent-light); border:1px solid var(--accent-border); border-radius:14px; padding:16px 18px; text-align:center;}
+  .typecard .no{ font-size:15px; color:var(--accent); font-weight:700; letter-spacing:1px;}
+  .typecard .nm{ font-size:22px; color:var(--primary); font-weight:800; margin:6px 0 4px;}
+  .typecard .ds{ font-size:15px; color:var(--muted); line-height:1.4;}
+
+  .steps{ display:flex; flex-direction:column; gap:12px; margin-top:8px;}
+  .step{ display:flex; gap:16px; align-items:center; background:var(--accent-light); border:1px solid var(--accent-border); border-radius:12px; padding:12px 18px;}
+  .step .no{ flex:none; width:38px; height:38px; border-radius:50%; background:var(--accent); color:#fff; font-weight:800; font-size:20px; display:flex; align-items:center; justify-content:center;}
+  .step .t{ font-size:20px; color:var(--text);}
+  .step .t b{ color:var(--primary); }
+
+  .pause{
+    background:var(--warn-bg); border:2px dashed var(--warning); border-radius:14px;
+    padding:12px 22px; margin:12px 0; display:flex; align-items:center; gap:16px;
+    box-shadow:0 4px 14px rgba(217,119,6,.12);
+  }
+  .pause .icon{ font-size:38px; line-height:1; }
+  .pause .txt b{ color:var(--warning); font-size:22px; }
+  .pause .txt p{ font-size:19px; color:#92400e; margin:3px 0 0; }
+
+  #footer{ position:absolute; bottom:0; left:0; right:0; height:40px; display:flex; align-items:center; justify-content:space-between; padding:0 30px; font-size:15px; color:#94a3b8; background:rgba(249,250,252,.85); border-top:1px solid var(--border); z-index:40;}
+  #footer .brand{ font-weight:600; color:var(--accent); }
+
+  .nav{ position:absolute; bottom:48px; right:40px; display:flex; gap:12px; z-index:45;}
+  .nav button{ width:54px; height:54px; border-radius:50%; border:none; background:var(--accent); color:#fff; font-size:24px; cursor:pointer; box-shadow:0 3px 10px rgba(37,99,235,.4); display:flex; align-items:center; justify-content:center;}
+  .nav button:hover{ background:var(--primary); }
+  .nav button:disabled{ background:#cbd5e0; cursor:default; box-shadow:none;}
+
+  #hint{ position:absolute; bottom:48px; left:40px; font-size:14px; color:#94a3b8; z-index:45;}
+
+  body.autohide #progress, body.autohide #footer, body.autohide .nav, body.autohide #hint{ display:none !important; }
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <div id="progress"></div>
+
+  <!-- 1 封面 -->
+  <section class="slide slide-cover active" data-narration="同学们好，欢迎来到病句修改系统讲解。这是高中语文语言文字运用板块里最稳、最该早拿下的分数。很多人改病句全靠语感，今天我们要换一种打法：用一套系统方法，把语感变成可复制的能力。这一讲，从地基讲到六大类型，再给你一张标志词速查卡和四步解题流程。准备好，我们开始。">
+    <div class="kicker">高 中 语 文 · 语言文字运用 · 云南新高考 II 卷</div>
+    <h1>病句修改系统讲解</h1>
+    <div class="sub">六大类型 · 标志词速查 · 四步解题 · 训练方法论</div>
+    <div class="divider"></div>
+    <div class="meta">
+      高一衔接版 · 高考一轮通用<br>
+      讲练结合 · 稳拿基础分
+    </div>
+  </section>
+
+  <!-- 2 讲什么 / 总览 -->
+  <section class="slide" data-narration="先说这一讲讲什么。第一，破除一个误解：语感是结果不是方法，系统才是骨架。第二，补一个地基：六个句子成分，这是提主干查病的前提。第三，六大病句类型，每种长什么样、怎么改。第四，一张标志词速查卡，看见什么词要亮红灯。第五，四步解题流程，拿到句子按步骤走。最后，怎么练才长语感。下面先建立整体印象。">
+    <div class="slide-head"><span class="sec">总览</span><h3>这一讲讲什么</h3></div>
+    <div class="slide-body">
+      <div class="goals">
+        <div class="goal"><span class="no">1</span><span class="t"><b>破除误解</b><br>语感是结果不是方法</span></div>
+        <div class="goal"><span class="no">2</span><span class="t"><b>补地基</b><br>六个句子成分</span></div>
+        <div class="goal"><span class="no">3</span><span class="t"><b>六大类型</b><br>每类长什么样、怎么改</span></div>
+        <div class="goal"><span class="no">4</span><span class="t"><b>标志词卡</b><br>看见什么词亮红灯</span></div>
+        <div class="goal"><span class="no">5</span><span class="t"><b>四步流程</b><br>拿到句子按步骤走</span></div>
+        <div class="goal"><span class="no">6</span><span class="t"><b>训练方法</b><br>怎么练才长语感</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 认知① -->
+  <section class="slide" data-narration="先破除一个误解。很多人觉得，改病句靠的就是语感，读着顺就对了。其实，语感好的人，本质是大脑里已经内化了语法规则和搭配习惯，只是说不清为什么。但语感不可传授，也不稳定，今天状态好改对了，明天疲劳就放过。所以它不是方法，是结果。">
+    <div class="slide-head"><span class="sec">认知</span><h3>语感是结果，不是方法</h3></div>
+    <div class="slide-body">
+      <p class="lead">很多人以为：改病句全靠语感，读着顺就对了。</p>
+      <div class="card">真相：语感好的人，是大脑里已经内化了语法规则和搭配习惯，只是说不清为什么。</div>
+      <div class="card">但语感 <strong>不可传授、也不稳定</strong>：今天状态好改对了，明天疲劳就放过。</div>
+      <div class="deep">结论：语感是结果，不是方法。</div>
+    </div>
+  </section>
+
+  <!-- 4 认知② -->
+  <section class="slide" data-narration="那正确姿态是什么？系统为主，语感兜底。系统，就是句子成分、六大类型、标志词、四步流程，这套骨架能覆盖高考百分之九十以上的病句。语感，是最后一道校验，读着别扭就标出来，回头用系统法复核。记住八个字：系统为主，语感兜底。">
+    <div class="slide-head"><span class="sec">认知</span><h3>正确姿态：系统为主，语感兜底</h3></div>
+    <div class="slide-body">
+      <div class="cols">
+        <div class="col">
+          <div class="card" style="border-color:var(--accent);"><b>系统（骨架）</b><br>句子成分 · 六大类型 · 标志词 · 四步流程<br>覆盖高考百分之九十以上病句</div>
+        </div>
+        <div class="col">
+          <div class="card" style="border-color:var(--warning);"><b>语感（兜底）</b><br>最后一道校验<br>读着别扭就标出来，回头用系统法复核</div>
+        </div>
+      </div>
+      <div class="deep" style="text-align:center;font-size:24px;margin-top:18px;">八字真言：系统为主，语感兜底</div>
+    </div>
+  </section>
+
+  <!-- 5 地基① 六成分 -->
+  <section class="slide" data-narration="改病句最基本的工具是提主干，提主干先要认识六个句子成分。主语，回答谁或者什么；谓语，回答干什么或者怎么样；宾语，是动作的对象；这三者是主干。定语修饰名词，状语修饰动词和形容词，补语补充说明结果和程度，这三者是枝叶。一句话，主干就是主谓宾，砍掉定状补，看剩下的能不能成立、搭不搭。">
+    <div class="slide-head"><span class="sec">地基</span><h3>六个句子成分</h3></div>
+    <div class="slide-body">
+      <table>
+        <thead><tr><th>成分</th><th>回答什么</th><th>标志</th><th>例子</th></tr></thead>
+        <tbody>
+          <tr><td><b>主语</b></td><td>谁 / 什么</td><td>—</td><td>（他）吃饭</td></tr>
+          <tr><td><b>谓语</b></td><td>干什么 / 怎么样</td><td>—</td><td>他（吃）饭</td></tr>
+          <tr><td><b>宾语</b></td><td>动作对象</td><td>—</td><td>他吃（饭）</td></tr>
+          <tr><td>定语</td><td>什么样的（名词）</td><td>的</td><td>（红）花</td></tr>
+          <tr><td>状语</td><td>怎样地</td><td>地</td><td>（认真）地写</td></tr>
+          <tr><td>补语</td><td>结果 / 程度</td><td>得</td><td>写（得好）</td></tr>
+        </tbody>
+      </table>
+      <div class="tip">主干 = 主语 + 谓语 +（宾语）；枝叶 = 定状补。砍掉枝叶看主干，残缺和搭配一砍就现形。</div>
+    </div>
+  </section>
+
+  <!-- 6 地基② 提主干查病 -->
+  <section class="slide" data-narration="举个例子。这句话：通过这次社会实践活动，使同学们增强了社会责任感。我们提主干，把定状补砍掉，通过什么，是状语，使同学们，让同学们做了宾语，全句找不到主语。这就是典型的成分残缺。改法很简单，删去通过，或者删去使，让同学们回到主语的位置。提主干，一砍就现形。">
+    <div class="slide-head"><span class="sec">地基</span><h3>提主干怎么查病</h3></div>
+    <div class="slide-body">
+      <p class="lead">原句：通过这次社会实践活动，使同学们增强了社会责任感。</p>
+      <div class="card">提主干：砍掉定状补 → 全句<strong>找不到主语</strong>（通过…是状语，使同学们…成了宾语）</div>
+      <div class="card">诊断：<strong>成分残缺</strong>（主语被介词和使吃掉）</div>
+      <div class="deep">改法：删去「通过」，或删去「使」，让「同学们」回主语位。</div>
+    </div>
+  </section>
+
+  <!-- 7 六大类型总览 -->
+  <section class="slide" data-narration="高考病句就这六大类，全部跑不掉。第一，语序不当；第二，搭配不当；第三，成分残缺或者赘余；第四，结构混乱；第五，表意不明；第六，不合逻辑。接下来我们一类一类过，每类给你典型错例和改法。别贪多，先把这六类的样子刻进脑子里。">
+    <div class="slide-head"><span class="sec">总览</span><h3>六大病句类型</h3></div>
+    <div class="slide-body">
+      <div class="typegrid">
+        <div class="typecard"><div class="no">类型 1</div><div class="nm">语序不当</div><div class="ds">顺序不对</div></div>
+        <div class="typecard"><div class="no">类型 2</div><div class="nm">搭配不当</div><div class="ds">主谓/动宾/两面</div></div>
+        <div class="typecard"><div class="no">类型 3</div><div class="nm">残缺或赘余</div><div class="ds">该有没 / 不该重</div></div>
+        <div class="typecard"><div class="no">类型 4</div><div class="nm">结构混乱</div><div class="ds">杂糅 / 易辙</div></div>
+        <div class="typecard"><div class="no">类型 5</div><div class="nm">表意不明</div><div class="ds">歧义 / 指代</div></div>
+        <div class="typecard"><div class="no">类型 6</div><div class="nm">不合逻辑</div><div class="ds">矛盾 / 分类</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 类型1 语序不当 -->
+  <section class="slide" data-narration="第一类，语序不当。词语或者分句的先后顺序不对。常见三种：多重定语状语顺序乱，比如许多附近的同学，处所应该在数量前面，改成附近的许多同学；关联词位置错，主语一致时关联词放主语后面；还有并列分句逻辑顺序错，应该先提出问题、再发现、再解决，不能颠倒。看到顺序别扭，先想这一类。">
+    <div class="slide-head"><span class="sec">类型 1</span><h3>语序不当</h3></div>
+    <div class="slide-body">
+      <p class="lead">词语或分句先后顺序不对。</p>
+      <ul>
+        <li><b>多重定语状语乱</b>：许多附近的同学 → 附近的许多同学（处所在数量前）</li>
+        <li><b>关联词位置错</b>：主语一致时，关联词放主语后面</li>
+        <li><b>并列分句逻辑错</b>：应「提出 → 发现 → 解决」，不能颠倒</li>
+      </ul>
+      <div class="tip">看到顺序别扭，先想这一类。</div>
+    </div>
+  </section>
+
+  <!-- 9 类型2 搭配不当 -->
+  <section class="slide" data-narration="第二类，搭配不当，这是最高频的。主谓不搭、动宾不搭、主宾不搭，还有一面两面不搭。比如，他的写作水平明显改进了，水平不能改进，应该提高；再比如，能否坚持锻炼是身体健康的保证，前面两面对后面一面，不搭。还有种属和对象也要看，知名度只能提高，不能扩大。搭配，是语感的硬功夫。">
+    <div class="slide-head"><span class="sec">类型 2</span><h3>搭配不当（最高频）</h3></div>
+    <div class="slide-body">
+      <ul>
+        <li><b>主谓不搭</b>：品质浮现 → 应是形象浮现</li>
+        <li><b>动宾不搭</b>：水平改进 → 水平提高</li>
+        <li><b>两面对一面</b>：能否…是保证 → 删能否或加是否</li>
+        <li><b>对象错</b>：扩大知名度 → 提高知名度</li>
+      </ul>
+      <div class="tip">搭配是语感的硬功夫，标志词卡上的并列词、两面词都指向它。</div>
+    </div>
+  </section>
+
+  <!-- 10 类型3 残缺赘余 -->
+  <section class="slide" data-narration="第三类，成分残缺或者赘余，简单说就是该有的没了，不该有的重复了。残缺最常见是主语被介词和使吃掉，通过什么使什么，必缺主语。赘余是重复，大约过了一个小时左右，大约和左右留一个；还有众多莘莘学子，莘莘本来就是众多，前面不能再加。看到介词开头和约数，警惕这一类。">
+    <div class="slide-head"><span class="sec">类型 3</span><h3>成分残缺或赘余</h3></div>
+    <div class="slide-body">
+      <div class="cols">
+        <div class="col">
+          <div class="card"><b>残缺</b><br>主语被介词和「使」吃掉：<br>通过…使… 必缺主语</div>
+        </div>
+        <div class="col">
+          <div class="card"><b>赘余</b><br>约数重复：大约…左右 留一个<br>众多莘莘学子（莘莘=众多，去掉众多）</div>
+        </div>
+      </div>
+      <div class="tip">看到介词开头、约数（约/左右/超过），警惕这一类。</div>
+    </div>
+  </section>
+
+  <!-- 11 类型4 结构混乱 -->
+  <section class="slide" data-narration="第四类，结构混乱，一句话硬揉两种句式。最典型是句式杂糅，原因是造成的，改成原因是或者是什么造成的；本着为原则，改成本着原则或者以什么为原则；深受所欢迎，去掉所。另一种是中途易辙，前半句主语没说完就换了主语。看到固定结构和长句，先查这一类。">
+    <div class="slide-head"><span class="sec">类型 4</span><h3>结构混乱</h3></div>
+    <div class="slide-body">
+      <p class="lead">一句话硬揉两种句式。</p>
+      <table>
+        <thead><tr><th>杂糅结构</th><th>改法（二选一）</th></tr></thead>
+        <tbody>
+          <tr><td>原因是…造成的</td><td>原因是 / 是…造成的</td></tr>
+          <tr><td>本着…为原则</td><td>本着…原则 / 以…为原则</td></tr>
+          <tr><td>深受…所欢迎</td><td>深受…欢迎 / 为…所欢迎</td></tr>
+        </tbody>
+      </table>
+      <div class="tip">另有「中途易辙」：前半句主语没说完就换主语，看到长句先查。</div>
+    </div>
+  </section>
+
+  <!-- 12 类型5 表意不明 -->
+  <section class="slide" data-narration="第五类，表意不明。语法没错，但意思含糊。比如，小李和小王一起吃饭，他给了她一张优惠券，谁给谁？再比如，三个学校的校长，是三所学校的校长，还是学校的三位校长？还有停顿不同意思不同，妹妹找不到妈妈心里很着急，是妹妹急还是妈妈急。看到代词和数量加名词，警惕歧义。">
+    <div class="slide-head"><span class="sec">类型 5</span><h3>表意不明（歧义）</h3></div>
+    <div class="slide-body">
+      <ul>
+        <li><b>指代不明</b>：他给了她 → 谁给谁？</li>
+        <li><b>数量歧义</b>：三个学校的校长 → 三所 / 三位？</li>
+        <li><b>停顿歧义</b>：妹妹找不到妈妈心里很着急 → 妹妹急还是妈妈急？</li>
+      </ul>
+      <div class="tip">看到代词、数量加名词，警惕歧义。</div>
+    </div>
+  </section>
+
+  <!-- 13 类型6 不合逻辑 -->
+  <section class="slide" data-narration="第六类，不合逻辑，事理上说不通。自相矛盾，他是多少个死难者中幸免的一个，死难和幸免打架；分类不当，商店里摆满葡萄苹果梨和水果，水果包含前面，不能并列；主客颠倒，数学对我很感兴趣，应该是我对数学；还有否定失当，防止这类事故不再发生，防止已经有否定意思，再加不就反了。逻辑错，语法可能对。">
+    <div class="slide-head"><span class="sec">类型 6</span><h3>不合逻辑</h3></div>
+    <div class="slide-body">
+      <ul>
+        <li><b>自相矛盾</b>：死难者中幸免的一个（死难≠幸免）</li>
+        <li><b>分类不当</b>：葡萄苹果梨和水果（水果包含前者）</li>
+        <li><b>主客颠倒</b>：数学对我感兴趣 → 我对数学感兴趣</li>
+        <li><b>否定失当</b>：防止…不再发生（防止已有否定，再加不反了）</li>
+      </ul>
+      <div class="tip">逻辑错，语法可能对——语法查完还要过一遍事理。</div>
+    </div>
+  </section>
+
+  <!-- 14 标志词十看 -->
+  <section class="slide" data-narration="这是一张速查卡，建议抄成小纸条。看见十类标志就亮红灯：并列词，警惕搭配和并列不当；关联词，警惕搭配和残缺；否定词，警惕否定失当；数量词，警惕约数重复；两面词，警惕两面对一面；介词开头，警惕主语残缺；代词，警惕指代不明；助词着了过，警惕时态矛盾；固定结构，警惕句式杂糅；程度副词叠加，警惕不合逻辑。高考病句九成带着标志，看见就报警。">
+    <div class="slide-head"><span class="sec">速查卡</span><h3>标志词十看</h3></div>
+    <div class="slide-body">
+      <table style="font-size:16px;">
+        <thead><tr><th>看到</th><th>警惕</th><th>例子</th></tr></thead>
+        <tbody>
+          <tr><td>并列词（和/与/及）</td><td>搭配/并列/语序</td><td>提高吸引力和知名度</td></tr>
+          <tr><td>关联词（因为所以）</td><td>搭配/语序/残缺</td><td>不管…仍然</td></tr>
+          <tr><td>否定词（不/否认/避免）</td><td>否定失当</td><td>防止…不再发生</td></tr>
+          <tr><td>数量词（约/左右/超过）</td><td>约数重复</td><td>超过两千多年</td></tr>
+          <tr><td>两面词（是否/能否）</td><td>两面对一面</td><td>能否成功取决于努力</td></tr>
+          <tr><td>介词开头（通过/由于）</td><td>主语残缺</td><td>通过…使…</td></tr>
+          <tr><td>代词（这/其/他）</td><td>指代不明</td><td>小李和小王…他给她</td></tr>
+          <tr><td>助词（着了过）</td><td>时态矛盾</td><td>删了…过</td></tr>
+          <tr><td>固定结构</td><td>句式杂糅</td><td>深受…所欢迎</td></tr>
+          <tr><td>程度副词叠加</td><td>不合逻辑</td><td>十分悬殊</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 15 四步流程 -->
+  <section class="slide" data-narration="拿到一个句子或者语段，按这四步走，别一上来就凭感觉改。第一步，语感初筛，通读标出别扭处；第二步，提主干，查残缺和搭配；第三步，扫标志，用刚才那张十看卡逐条过；第四步，逻辑复核，语法都对再查事理通不通。口诀：一读二砍三看标志四逻辑。四类病根，跑不掉。">
+    <div class="slide-head"><span class="sec">流程</span><h3>四步解题流程</h3></div>
+    <div class="slide-body">
+      <div class="steps">
+        <div class="step"><span class="no">1</span><span class="t"><b>读</b>：语感初筛，通读标出别扭处</span></div>
+        <div class="step"><span class="no">2</span><span class="t"><b>砍</b>：提主干，查残缺和搭配</span></div>
+        <div class="step"><span class="no">3</span><span class="t"><b>看标志</b>：用十看卡逐条扫</span></div>
+        <div class="step"><span class="no">4</span><span class="t"><b>逻辑</b>：语法都对，再查事理通不通</span></div>
+      </div>
+      <div class="deep" style="text-align:center;margin-top:14px;">口诀：一读二砍三看标志四逻辑</div>
+    </div>
+  </section>
+
+  <!-- 16 动手练一题（互动暂停） -->
+  <section class="slide" data-narration="我们动手练一题。这句话有语病：通过这次活动，使同学们受到了教育。你先暂停视频，自己找出来改一改，改完再继续播放。好，揭晓答案，这句话缺主语，通过和使同时用，把主语吃掉了，删去通过，或者删去使，让同学们做主语，句子就通了。你改对了吗？">
+    <div class="slide-head"><span class="sec">实战</span><h3>动手练一题</h3></div>
+    <div class="slide-body">
+      <div class="card" style="font-size:23px;">病句：通过这次活动，使同学们受到了教育。</div>
+      <div class="pause">
+        <span class="icon">⏸</span>
+        <span class="txt"><b>暂停一下</b><p>自己找出来改一改，改完再继续播放。</p></span>
+      </div>
+      <div class="deep">答案：缺主语。删去「通过」或删去「使」，让「同学们」做主语。</div>
+    </div>
+  </section>
+
+  <!-- 17 训练法① 间隔重提取 -->
+  <section class="slide" data-narration="最后讲怎么练才长语感。第一招，间隔重提取。不要连刷三遍当场题，那样记不牢。正确做法是：第一天做，第三天重做错题，第十天再做一遍。记忆在快忘的时候提取一次，固化最深。高一不必每天练，每周十五分钟微训练就够。">
+    <div class="slide-head"><span class="sec">训练法</span><h3>第一招 · 间隔重提取</h3></div>
+    <div class="slide-body">
+      <p class="lead">不要连刷三遍当场题——那样记不牢。</p>
+      <div class="card">正确做法：<strong>第 1 天做 → 第 3 天重做错题 → 第 10 天再做一遍</strong></div>
+      <div class="card">原理：记忆在「快忘时」提取一次，固化最深。</div>
+      <div class="tip">高一每周 15 分钟微训练就够，不追求天天练。</div>
+    </div>
+  </section>
+
+  <!-- 18 训练法② 归类+朗读 -->
+  <section class="slide" data-narration="第二招，错题必归类，这是最关键的一步。每道错题，强迫自己写一句：这是六大型里的哪一类，触发了哪个标志。语感就在这归类里长出来，不归类等于白练。第三招，朗读改后句，把正确答案出声读出来，让耳朵记住对的样子。归类加朗读，语感是练出来的，不是等出来的。">
+    <div class="slide-head"><span class="sec">训练法</span><h3>第二招 · 错题归类 + 朗读</h3></div>
+    <div class="slide-body">
+      <div class="card"><b>错题必归类（最关键）</b>：每错一道写一句——这是六大型哪类 + 触发了哪个标志。语感就在这归类里长出来。</div>
+      <div class="card"><b>朗读改后句</b>：把正确答案出声读出来，让耳朵记住「对」的样子。</div>
+      <div class="deep">归类加朗读，语感是练出来的，不是等出来的。</div>
+    </div>
+  </section>
+
+  <!-- 19 结尾 -->
+  <section class="slide slide-divider" data-narration="总结一下：病句不靠玄学语感，靠系统方法。六大类型记牢，标志词卡随身，四步流程走顺，错题必归类。高一阶段目标就一个，把这套框架刻进肌肉记忆，不追求题量碾压。到高二高三，语言文字运用那几分，会非常稳。这份讲义配套练习已经备好，去练吧，加油。">
+    <div class="num">END</div>
+    <h2>把框架刻进肌肉记忆</h2>
+    <div class="en">六大类型 · 标志词卡 · 四步流程 · 错题归类</div>
+  </section>
+
+  <!-- 页脚 -->
+  <div id="footer">
+    <span class="brand">病句修改系统讲解</span>
+    <span id="pagenum">1 / 19</span>
+  </div>
+
+  <!-- 导航 -->
+  <div class="nav">
+    <button id="prev" title="上一页 (←)">‹</button>
+    <button id="next" title="下一页 (→ / 空格)">›</button>
+    <button id="fs" title="全屏 (F)">⛶</button>
+  </div>
+  <div id="hint">← → 翻页 · 空格下一页 · F 全屏 · 点击左右半屏翻页 · 共 19 页</div>
+
+</div>
+
+<script>
+(function(){
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  let idx = 0;
+
+  const params = new URLSearchParams(location.search);
+  const startSlide = parseInt(params.get('slide'), 10);
+  if (params.get('autohide') === '1') document.body.classList.add('autohide');
+  if (!isNaN(startSlide) && startSlide >= 1 && startSlide <= total) idx = startSlide - 1;
+  const hashSlide = parseInt((location.hash || '').replace('#', ''), 10);
+  if (!isNaN(hashSlide) && hashSlide >= 1 && hashSlide <= total) idx = hashSlide - 1;
+
+  const progress = document.getElementById('progress');
+  const pagenum = document.getElementById('pagenum');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+
+  function render(){
+    slides.forEach((s,i)=> s.classList.toggle('active', i===idx));
+    progress.style.width = ((idx+1)/total*100) + '%';
+    pagenum.textContent = (idx+1) + ' / ' + total;
+    prevBtn.disabled = (idx===0);
+    nextBtn.disabled = (idx===total-1);
+    try { history.replaceState(null, '', '#' + (idx+1)); } catch(e){}
+  }
+  function go(n){ idx = Math.max(0, Math.min(total-1, n)); render(); }
+
+  prevBtn.addEventListener('click', e=>{ e.stopPropagation(); go(idx-1); });
+  nextBtn.addEventListener('click', e=>{ e.stopPropagation(); go(idx+1); });
+
+  function toggleFull(){
+    if(!document.fullscreenElement){
+      const el = document.documentElement;
+      if(el.requestFullscreen) el.requestFullscreen();
+    } else if(document.exitFullscreen){
+      document.exitFullscreen();
+    }
+  }
+  document.getElementById('fs').addEventListener('click', e=>{ e.stopPropagation(); toggleFull(); });
+
+  document.addEventListener('keydown', e=>{
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){ e.preventDefault(); go(idx+1); }
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); go(idx-1); }
+    else if(e.key==='Home'){ go(0); }
+    else if(e.key==='End'){ go(total-1); }
+    else if(e.key==='f'||e.key==='F'){ toggleFull(); }
+  });
+
+  window.addEventListener('hashchange', ()=>{
+    const n = parseInt((location.hash || '').replace('#', ''), 10);
+    if(!isNaN(n) && n>=1 && n<=total && n-1!==idx){ idx = n-1; render(); }
+  });
+
+  document.getElementById('stage').addEventListener('click', e=>{
+    if(e.target.closest('.nav')) return;
+    const x = e.clientX;
+    if(x < window.innerWidth*0.5) go(idx-1); else go(idx+1);
+  });
+
+  function fit(){
+    const s = Math.min(window.innerWidth/1280, window.innerHeight/720);
+    document.getElementById('stage').style.transform = 'translate(-50%,-50%) scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+  render();
+})();
+</script>
+</body>
+</html>
