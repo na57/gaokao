@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>不等式复习讲解</title>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true,
+    tags: 'none'
+  },
+  svg: { fontCache: 'global', scale: 1.05 },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --primary:#0f766e; --accent:#0d9488; --accent-light:#ecfdf5; --accent-border:#99f6e4;
+    --text:#2d3748; --muted:#718096; --border:#e2e8f0; --bg-light:#f7fafc;
+    --success:#38a169; --danger:#e53e3e; --warning:#dd6b20; --warn-bg:#fffaf0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:100%;height:100%;overflow:hidden;background:#0f172a;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","WenQuanYi Micro Hei",sans-serif;
+    color:var(--text);
+  }
+  #stage{
+    position:absolute; left:50%; top:50%;
+    width:1280px; height:720px;
+    transform:translate(-50%,-50%) scale(1);
+    transform-origin:center center;
+    background:#ffffff;
+    box-shadow:0 0 40px rgba(0,0,0,.4);
+    overflow:hidden;
+  }
+  .slide{
+    position:absolute; inset:0;
+    padding:36px 60px 52px;
+    display:none;
+    flex-direction:column;
+    background:#ffffff;
+    opacity:0;
+    transition:opacity .35s ease;
+  }
+  .slide.active{ display:flex; opacity:1; }
+
+  #progress{ position:absolute; top:0; left:0; height:6px; background:var(--accent); width:0; z-index:50; transition:width .35s; }
+
+  .slide-cover, .slide-divider{ justify-content:center; align-items:center; text-align:center; }
+  .slide-cover{ background:linear-gradient(135deg,#0f766e 0%,#0d9488 100%); color:#fff; }
+  .slide-cover .kicker{ font-size:22px; letter-spacing:6px; opacity:.85; margin-bottom:18px;}
+  .slide-cover h1{ font-size:64px; font-weight:800; line-height:1.2; margin-bottom:22px; letter-spacing:2px;}
+  .slide-cover .sub{ font-size:26px; opacity:.92; margin-bottom:36px;}
+  .slide-cover .meta{ font-size:18px; opacity:.85; line-height:2;}
+  .slide-cover .divider{ width:160px;height:5px;background:#fff;opacity:.6;margin:0 auto 30px;border-radius:3px;}
+
+  .slide-divider{ background:linear-gradient(135deg,#0d9488 0%,#0f766e 100%); color:#fff;}
+  .slide-divider .num{ font-size:30px; opacity:.7; letter-spacing:4px; margin-bottom:10px;}
+  .slide-divider h2{ font-size:56px; font-weight:800; letter-spacing:3px;}
+  .slide-divider .en{ font-size:20px; opacity:.8; margin-top:16px; letter-spacing:2px;}
+
+  .slide-head{ display:flex; align-items:baseline; gap:16px; border-bottom:3px solid var(--accent); padding-bottom:9px; margin-bottom:12px;}
+  .slide-head .sec{ font-size:17px; color:var(--accent); font-weight:700; background:var(--accent-light); padding:3px 11px; border-radius:6px;}
+  .slide-head h3{ font-size:30px; color:var(--primary); font-weight:700;}
+  .slide-body{ flex:1; display:flex; flex-direction:column; justify-content:center; min-height:0; }
+
+  p{ font-size:21px; line-height:1.65; margin-bottom:8px; text-align:justify;}
+  .lead{ font-size:23px; color:#374151; line-height:1.75;}
+  ul,ol{ margin:0 0 8px 26px; font-size:21px; line-height:1.7;}
+  li{ margin-bottom:5px;}
+  strong{ color:var(--primary); }
+
+  .formula{ background:var(--accent-light); border-left:5px solid var(--accent); border-radius:0 10px 10px 0; padding:9px 22px; margin:9px 0; text-align:center; font-size:23px;}
+  .formula-concl{ background:#fffaf0; border-left:5px solid var(--warning);}
+  .MathJax{ font-size:1.05em !important; }
+
+  table{ width:100%; border-collapse:collapse; margin:10px 0; font-size:20px;}
+  th{ background:var(--accent); color:#fff; padding:7px 12px; text-align:center; font-weight:600;}
+  td{ padding:7px 12px; border:1px solid var(--border); text-align:center; vertical-align:middle;}
+  tr:nth-child(even) td{ background:var(--bg-light);}
+
+  .card{ background:var(--accent-light); border:1px solid var(--accent-border); border-radius:12px; padding:12px 20px; margin:10px 0;}
+  .tip{ background:#ecfdf5; border-left:5px solid var(--accent); border-radius:0 10px 10px 0; padding:10px 20px; margin:10px 0; font-size:20px; color:#134e4a;}
+  .deep{ background:#f0fff4; border-left:5px solid var(--success); border-radius:0 10px 10px 0; padding:10px 20px; margin:10px 0; font-size:20px; color:#22543d;}
+
+  .pause{
+    background:var(--warn-bg); border:2px dashed var(--warning); border-radius:14px;
+    padding:12px 22px; margin:12px 0; display:flex; align-items:center; gap:16px;
+    box-shadow:0 4px 14px rgba(221,107,32,.12);
+  }
+  .pause .icon{ font-size:38px; line-height:1; }
+  .pause .txt b{ color:var(--warning); font-size:22px; }
+  .pause .txt p{ font-size:19px; color:#744210; margin:3px 0 0; }
+
+  .cols{ display:flex; gap:28px; align-items:center; }
+  .col{ flex:1; }
+
+  /* 复习目标卡片网格 */
+  .goals{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px 26px; margin-top:6px;}
+  .goal{ display:flex; gap:12px; align-items:flex-start; background:var(--accent-light); border:1px solid var(--accent-border); border-radius:12px; padding:11px 16px;}
+  .goal .no{ flex:none; width:30px; height:30px; border-radius:50%; background:var(--accent); color:#fff; font-weight:700; font-size:16px; display:flex; align-items:center; justify-content:center;}
+  .goal .t{ font-size:19px; color:var(--text); line-height:1.45;}
+  .goal .t b{ color:var(--primary); }
+
+  .fig{ text-align:center; margin:6px 0; }
+  .fig img{ max-width:100%; max-height:430px; display:inline-block; }
+  .fig .cap{ font-size:15px; color:var(--muted); margin-top:4px; }
+
+  #footer{ position:absolute; bottom:0; left:0; right:0; height:40px; display:flex; align-items:center; justify-content:space-between; padding:0 30px; font-size:15px; color:#94a3b8; background:rgba(247,250,252,.85); border-top:1px solid var(--border); z-index:40;}
+  #footer .brand{ font-weight:600; color:var(--accent); }
+
+  .nav{ position:absolute; bottom:48px; right:40px; display:flex; gap:12px; z-index:45;}
+  .nav button{ width:54px; height:54px; border-radius:50%; border:none; background:var(--accent); color:#fff; font-size:24px; cursor:pointer; box-shadow:0 3px 10px rgba(13,148,136,.4); display:flex; align-items:center; justify-content:center;}
+  .nav button:hover{ background:var(--primary); }
+  .nav button:disabled{ background:#cbd5e0; cursor:default; box-shadow:none;}
+
+  #hint{ position:absolute; bottom:48px; left:40px; font-size:14px; color:#94a3b8; z-index:45;}
+
+  body.autohide #progress, body.autohide #footer, body.autohide .nav, body.autohide #hint{ display:none !important; }
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <div id="progress"></div>
+
+  <!-- 1 封面 -->
+  <section class="slide slide-cover active" data-narration="同学们好，欢迎来到不等式章节复习课。不等式不是孤立的一章，它是贯穿高中三年的暗线，定义域、值域、最值、恒成立，几乎处处都要用到。这一讲，我们把整章的核心知识、易错陷阱和高考考法系统串一遍，中间我会请你暂停视频，亲手算一两道典型题。准备好纸笔，我们开始。">
+    <div class="kicker">高 中 数 学 · 必 修 一 · 第 二 章</div>
+    <h1>不等式复习讲解</h1>
+    <div class="sub">性质 · 三个二次 · 基本不等式 · 拓展专题 · 数学思想</div>
+    <div class="divider"></div>
+    <div class="meta">
+      高一同步巩固 · 高考一轮复习通用<br>
+      重点 · 易错点 · 题型归纳 · 深度理解
+    </div>
+  </section>
+
+  <!-- 2 复习目标 / 知识地图 -->
+  <section class="slide" data-narration="先说这一讲复习什么。第一，不等式的性质和三大易错点。第二，一元二次不等式，也就是三个二次的合体。第三，基本不等式，求最值的第一神器。第四，拓展专题，绝对值、分式、高次穿针、柯西。第五，贯穿全章的数学思想。下面这张知识地图，先建立整体印象，后面我们逐块展开。">
+    <div class="slide-head"><span class="sec">总览</span><h3>复习目标 · 知识地图</h3></div>
+    <div class="slide-body">
+      <div class="cols">
+        <div class="col">
+          <div class="goals">
+            <div class="goal"><span class="no">1</span><span class="t"><b>不等式性质</b><br>八大性质 · 三大易错点</span></div>
+            <div class="goal"><span class="no">2</span><span class="t"><b>三个二次</b><br>函数 · 方程 · 不等式</span></div>
+            <div class="goal"><span class="no">3</span><span class="t"><b>基本不等式</b><br>一正二定三相等</span></div>
+            <div class="goal"><span class="no">4</span><span class="t"><b>拓展专题</b><br>绝对值 · 分式 · 高次 · 柯西</span></div>
+            <div class="goal"><span class="no">5</span><span class="t"><b>数学思想</b><br>数形结合 · 转化 · 分类</span></div>
+            <div class="goal"><span class="no">6</span><span class="t"><b>高考考法</b><br>融合题 · 得分基本盘</span></div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="fig">
+            <svg viewBox="0 0 440 360" width="420" height="344" style="max-height:430px;">
+              <defs>
+                <marker id="km-arrow" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#0d9488"/></marker>
+              </defs>
+              <!-- 连线 -->
+              <g stroke="#0d9488" stroke-width="2" fill="none">
+                <line x1="220" y1="44" x2="90" y2="118"/>
+                <line x1="220" y1="44" x2="220" y2="118"/>
+                <line x1="220" y1="44" x2="350" y2="118"/>
+                <line x1="220" y1="44" x2="220" y2="250" stroke-dasharray="5 4"/>
+              </g>
+              <!-- 根节点 -->
+              <rect x="156" y="14" width="128" height="46" rx="12" fill="#0f766e" stroke="#0d9488" stroke-width="2"/>
+              <text x="220" y="43" text-anchor="middle" fill="#fff" font-size="22" font-weight="800">不等式</text>
+              <!-- 一级节点 -->
+              <g font-size="17" font-weight="700">
+                <rect x="28" y="118" width="124" height="40" rx="10" fill="#ecfdf5" stroke="#0d9488" stroke-width="2"/>
+                <text x="90" y="143" text-anchor="middle" fill="#0f766e">不等式性质</text>
+                <rect x="158" y="118" width="124" height="40" rx="10" fill="#ecfdf5" stroke="#0d9488" stroke-width="2"/>
+                <text x="220" y="143" text-anchor="middle" fill="#0f766e">三个二次</text>
+                <rect x="288" y="118" width="124" height="40" rx="10" fill="#ecfdf5" stroke="#0d9488" stroke-width="2"/>
+                <text x="350" y="143" text-anchor="middle" fill="#0f766e">基本不等式</text>
+                <rect x="158" y="250" width="124" height="40" rx="10" fill="#fffaf0" stroke="#dd6b20" stroke-width="2"/>
+                <text x="220" y="275" text-anchor="middle" fill="#9a3412">拓展专题</text>
+              </g>
+              <!-- 叶子 -->
+              <g font-size="14" fill="#475569" text-anchor="middle">
+                <text x="90" y="186">传递 · 可加 · 可乘</text>
+                <text x="90" y="208">同向相加相乘</text>
+                <text x="220" y="186">二次函数</text>
+                <text x="220" y="208">方程 · 不等式</text>
+                <text x="350" y="186">a²+b²≥2ab</text>
+                <text x="350" y="208">均值 · 求最值</text>
+                <text x="220" y="312">绝对值 · 分式</text>
+                <text x="220" y="334">高次穿针 · 柯西</text>
+              </g>
+            </svg>
+            <div class="cap">不等式全章知识地图</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 不等式是什么 -->
+  <section class="slide" data-narration="小学和初中我们研究等式和方程，核心是等于。但真实世界里更多时候是比大小，这就是不等式。关键区别在这里：方程求的是某一个确定的值，比如 x 加 3 等于 5，解是 x 等于 2，一个数；不等式求的是一整个范围，x 加 3 大于 5，解是 x 大于 2，无穷多个数。大于、小于、大于等于、小于等于，这几种符号都要认全。">
+    <div class="slide-head"><span class="sec">一</span><h3>不等式是什么 · 从等式的亲戚说起</h3></div>
+    <div class="slide-body">
+      <p class="lead">方程求的是<span>某一个确定的值</span>；不等式求的是<span>一整个范围</span>。</p>
+      <div class="cols">
+        <div class="col">
+          <table>
+            <thead><tr><th>语言描述</th><th>数学表达</th></tr></thead>
+            <tbody>
+              <tr><td>$a$ 大于 $b$</td><td>$a &gt; b$</td></tr>
+              <tr><td>$a$ 大于或等于 $b$</td><td>$a \geq b$</td></tr>
+              <tr><td>$a$ 小于 $b$</td><td>$a &lt; b$</td></tr>
+              <tr><td>$a$ 小于或等于 $b$</td><td>$a \leq b$</td></tr>
+              <tr><td>$a$ 不等于 $b$</td><td>$a \neq b$</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col">
+          <div class="card"><b>方程</b>：$x+3=5\ \Rightarrow\ x=2$（一个数）</div>
+          <div class="card"><b>不等式</b>：$x+3&gt;5\ \Rightarrow\ x&gt;2$（无穷多个数）</div>
+          <div class="deep">💡 真实世界多是比较大小，不等式是更常用的语言。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 八大性质 -->
+  <section class="slide" data-narration="不等式有八大核心性质，是一切推理的地基。对称性：a 大于 b 等价于 b 小于 a。传递性：a 大于 b，b 大于 c，推出 a 大于 c。可加性：大的加同一个数还是大。可乘性要注意符号：乘正数不变号，乘负数要变号。还有同向相加、同向相乘（前提都是正数）、乘方、开方。这八条，建议背下来。">
+    <div class="slide-head"><span class="sec">二</span><h3>不等式的八大核心性质</h3></div>
+    <div class="slide-body">
+      <table>
+        <thead><tr><th>序号</th><th>性质</th><th>内容（$a,b,c$ 为实数）</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>对称性</td><td>$a&gt;b \Longleftrightarrow b&lt;a$</td></tr>
+          <tr><td>2</td><td>传递性</td><td>$a&gt;b,\ b&gt;c\ \Rightarrow\ a&gt;c$</td></tr>
+          <tr><td>3</td><td>可加性</td><td>$a&gt;b\ \Rightarrow\ a+c&gt;b+c$</td></tr>
+          <tr><td>4</td><td>可乘性</td><td>$a&gt;b,\ c&gt;0\Rightarrow ac&gt;bc$；$c&lt;0\Rightarrow ac&lt;bc$</td></tr>
+          <tr><td>5</td><td>同向相加</td><td>$a&gt;b,\ c&gt;d\ \Rightarrow\ a+c&gt;b+d$</td></tr>
+          <tr><td>6</td><td>同向相乘</td><td>$a&gt;b&gt;0,\ c&gt;d&gt;0\ \Rightarrow\ ac&gt;bd$</td></tr>
+          <tr><td>7</td><td>乘方</td><td>$a&gt;b&gt;0,\ n\in\mathbb{N}^*\ \Rightarrow\ a^n&gt;b^n$</td></tr>
+          <tr><td>8</td><td>开方</td><td>$a&gt;b&gt;0,\ n\in\mathbb{N}^*\ \Rightarrow\ \sqrt[n]{a}&gt;\sqrt[n]{b}$</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 5 三大易错点 -->
+  <section class="slide" data-narration="三条最易错的，务必背成条件反射。第一，乘或除以负数必须变号，这是解不等式最容易翻车的地方。第二，同向相乘要求两边都是正数，有负数不能直接乘。第三，倒数不等式要变号，a 大于 b 大于 0，则 a 分之一小于 b 分之一，分母越大倒数越小。">
+    <div class="slide-head"><span class="sec">二</span><h3>⚠️ 三大易错点（务必背下）</h3></div>
+    <div class="slide-body">
+      <table>
+        <thead><tr><th>序号</th><th>易错点</th><th>正确做法</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>乘（除）负数变号</td><td>$a&gt;b\ \Rightarrow\ ac&lt;bc\ (c&lt;0)$，解不等式头号翻车点</td></tr>
+          <tr><td>2</td><td>同向相乘要正数</td><td>$a&gt;b,\ c&gt;d$ 有负数时不能直接相乘</td></tr>
+          <tr><td>3</td><td>倒数不等式变号</td><td>$a&gt;b&gt;0\ \Rightarrow\ \dfrac1a&lt;\dfrac1b$，分母越大倒数越小</td></tr>
+        </tbody>
+      </table>
+      <div class="deep">💡 三条易错点，每次做题前先扫一眼，比临时推导更稳。</div>
+    </div>
+  </section>
+
+  <!-- 6 作差比较法 + 例题1 -->
+  <section class="slide" data-narration="比较大小有个万能钥匙，叫作差比较法。判断 A 和 B 谁大，就看 A 减 B 的符号：大于 0 则 A 大，等于 0 则相等，小于 0 则 B 大。例题一，比较括号 a 加 3 乘括号 a 减 5，与括号 a 加 2 乘括号 a 减 4 的大小。作差展开，得到负 7 小于 0，所以前者小于后者。任何不等式证明，理论上都能化为作差判断符号。">
+    <div class="slide-head"><span class="sec">二</span><h3>比较大小万能钥匙 · 作差比较法</h3></div>
+    <div class="slide-body">
+      <div class="formula">$A-B&gt;0\Rightarrow A&gt;B$；$\ A-B=0\Rightarrow A=B$；$\ A-B&lt;0\Rightarrow A&lt;B$</div>
+      <div class="card"><b>例题1</b>：比较 $(a+3)(a-5)$ 与 $(a+2)(a-4)$ 的大小</div>
+      <div class="formula">$(a+3)(a-5)-(a+2)(a-4)=(a^2-2a-15)-(a^2-2a-8)=-7&lt;0$</div>
+      <div class="deep">💡 所以 $(a+3)(a-5) &lt; (a+2)(a-4)$。作差判断符号，是最本质的方法。</div>
+    </div>
+  </section>
+
+  <!-- 7 三个二次关系（图0） -->
+  <section class="slide" data-narration="进入重点，一元二次不等式，秘诀只有一句话：把不等式翻译成函数图像来看。所谓三个二次，指二次函数、一元二次方程、一元二次不等式，本质是同一件事的三个侧面。方程的解，就是抛物线与 x 轴交点的横坐标；不等式大于 0，就是抛物线在 x 轴上方的部分；小于 0，就是下方的部分。看图，一眼就明白了。">
+    <div class="slide-head"><span class="sec">三</span><h3>三个二次的关系</h3></div>
+    <div class="slide-body">
+      <div class="fig">
+        <img src="images/不等式-三个二次关系.svg" alt="三个二次关系">
+        <div class="cap">二次函数 ⇄ 方程 ⇄ 不等式，同一件事的三个侧面</div>
+      </div>
+      <div class="tip">📌 方程的解 = 抛物线与 x 轴交点横坐标；大于 0 = 轴上方；小于 0 = 轴下方。</div>
+    </div>
+  </section>
+
+  <!-- 8 图像法 + 判别式表 + 口诀 -->
+  <section class="slide" data-narration="具体怎么解？设判别式 delta 等于 b 平方减 4ac。分三种情况：delta 大于 0，两根，大于取两边、小于取中间；delta 等于 0，一根，大于取除这个点外的全部，小于无解；delta 小于 0，无实根，大于取全体实数，小于无解。前提都是 a 大于 0，开口向上。一句口诀记死：大于取两边，小于取中间。">
+    <div class="slide-head"><span class="sec">三</span><h3>图像法解一元二次不等式</h3></div>
+    <div class="slide-body">
+      <table>
+        <thead><tr><th>判别式</th><th>图像位置</th><th>$ax^2+bx+c&gt;0$</th><th>$ax^2+bx+c&lt;0$</th></tr></thead>
+        <tbody>
+          <tr><td>$\Delta&gt;0$<br>两根 $x_1&lt;x_2$</td><td>交于两点</td><td>$x&lt;x_1$ 或 $x&gt;x_2$</td><td>$x_1&lt;x&lt;x_2$</td></tr>
+          <tr><td>$\Delta=0$<br>一根 $x_0$</td><td>相切</td><td>$x\neq x_0$</td><td>无解 $\emptyset$</td></tr>
+          <tr><td>$\Delta&lt;0$<br>无实根</td><td>全在轴上方</td><td>全体实数 $\mathbb{R}$</td><td>无解 $\emptyset$</td></tr>
+        </tbody>
+      </table>
+      <div class="formula formula-concl">口诀（前提 $a&gt;0$）：<b>大于取两边，小于取中间</b></div>
+    </div>
+  </section>
+
+  <!-- 9 图像法图1 -->
+  <section class="slide" data-narration="下面三幅图，把上面的判别式表翻译成抛物线，一眼看清大于取两边、小于取中间。注意左侧是 delta 大于 0，中间是 delta 等于 0，右侧是 delta 小于 0。无论哪种情况，只要 a 大于 0，规律始终不变。把图和口诀绑定，这题就稳了。">
+    <div class="slide-head"><span class="sec">三</span><h3>数形结合 · 三种判别式对照</h3></div>
+    <div class="slide-body">
+      <div class="fig">
+        <img src="images/不等式-一元二次图像法.svg" alt="一元二次图像法">
+        <div class="cap">△&gt;0 取两边/中间 · △=0 切点 · △&lt;0 全体实数</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 解题标准流程（图5） -->
+  <section class="slide" data-narration="总结一套标准解题流程：第一步，先把二次项系数化正，注意变号；第二步，解方程求两根；第三步，根据口诀写解集；第四步，写成区间或集合形式。照这个流程走，一步都不会乱。">
+    <div class="slide-head"><span class="sec">三</span><h3>解题标准流程</h3></div>
+    <div class="slide-body">
+      <div class="fig">
+        <img src="images/不等式-解题标准流程.svg" alt="解题标准流程">
+        <div class="cap">化正 → 求根 → 按口诀写解 → 写成区间</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 例题2 -->
+  <section class="slide" data-narration="例题二，解不等式 x 平方减 3x 减 4 大于 0。因式分解成括号 x 减 4 括号 x 加 1，两根是负 1 和 4，a 等于 1 大于 0，开口向上，大于取两边：x 小于负 1，或 x 大于 4。解集写成负无穷到负 1，并上 4 到正无穷。">
+    <div class="slide-head"><span class="sec">三</span><h3>例题2 · $x^2-3x-4&gt;0$</h3></div>
+    <div class="slide-body">
+      <p><b>解</b>：因式分解 $x^2-3x-4=(x-4)(x+1)$</p>
+      <div class="formula">两根 $x_1=-1,\ x_2=4$，$a=1&gt;0$ 开口向上，大于取两边</div>
+      <div class="formula">$x&lt;-1\ \text{或}\ x&gt;4\ \Rightarrow\ (-\infty,-1)\cup(4,+\infty)$</div>
+    </div>
+  </section>
+
+  <!-- 12 例题3 【互动】 -->
+  <section class="slide" data-narration="例题三，解不等式负 2x 平方加 3x 加 2 小于等于 0。这道题我先不往下讲。你暂停视频，自己按刚才的流程算一算，注意第一步要化正、变号。你算出来了吗？好，我们核对：两边同乘负 1 变号，得到 2x 平方减 3x 减 2 大于等于 0，因式分解成括号 2x 加 1 括号 x 减 2 大于等于 0，两根是负二分之一和 2，取两边：x 小于等于负二分之一，或 x 大于等于 2。">
+    <div class="slide-head"><span class="sec">三</span><h3>例题3 · $-2x^2+3x+2\leq 0$【动手算】</h3></div>
+    <div class="slide-body">
+      <div class="pause">
+        <div class="icon">✋</div>
+        <div class="txt"><b>暂停推导</b><p>自己按流程算一算：先化正变号，再因式分解、求根、写解集。</p></div>
+      </div>
+      <p><b>解</b>：两边同乘 $-1$ 变号 → $2x^2-3x-2\geq 0$</p>
+      <div class="formula">$(2x+1)(x-2)\geq 0$，两根 $x_1=-\dfrac12,\ x_2=2$，取两边</div>
+      <div class="formula">$x\leq-\dfrac12\ \text{或}\ x\geq 2\ \Rightarrow\ \left(-\infty,-\dfrac12\right]\cup[2,+\infty)$</div>
+    </div>
+  </section>
+
+  <!-- 13 恒成立 + 例题4 -->
+  <section class="slide" data-narration="恒成立问题，是三个二次的高级玩法，方法固定：a x 平方加 b x 加 c 大于 0 恒成立，等价于 a 大于 0 且 delta 小于 0；小于 0 恒成立，等价于 a 小于 0 且 delta 小于 0。例题四，x 平方减 2x 加 k 大于 0 对任意实数恒成立，求 k。a 等于 1 大于 0，只需 delta 小于 0，解得 k 大于 1。注意：二次项系数含参数时要分类讨论 m 等于 0 的情况，不能漏。">
+    <div class="slide-head"><span class="sec">三</span><h3>恒成立问题 · 求参数范围</h3></div>
+    <div class="slide-body">
+      <div class="formula">$ax^2+bx+c&gt;0$ 恒成立 $\Longleftrightarrow a&gt;0$ 且 $\Delta&lt;0$</div>
+      <div class="formula">$ax^2+bx+c&lt;0$ 恒成立 $\Longleftrightarrow a&lt;0$ 且 $\Delta&lt;0$</div>
+      <div class="card"><b>例题4</b>：$x^2-2x+k&gt;0$ 对 $\forall x\in\mathbb{R}$ 恒成立，求 $k$</div>
+      <div class="formula">$a=1&gt;0$，$\Delta=4-4k&lt;0\ \Rightarrow\ k&gt;1$</div>
+      <div class="tip">⚠️ 二次项系数含参数（如 $mx^2+2x+1&gt;0$）要分类讨论 $m=0$ 与 $m\neq 0$。</div>
+    </div>
+  </section>
+
+  <!-- 14 基本不等式 a²+b²≥2ab + 均值 -->
+  <section class="slide" data-narration="进入求最值的第一神器，基本不等式。起点很简单：任何实数平方都大于等于 0，于是 a 减 b 平方大于等于 0，展开得到 a 平方加 b 平方大于等于 2ab，当且仅当 a 等于 b 取等。把 a、b 换成根号 a、根号 b，就得到均值不等式：a 加 b 除以 2 大于等于根号 ab，前提 a、b 都大于 0。常用等价变形有三个，务必熟练。">
+    <div class="slide-head"><span class="sec">四</span><h3>基本不等式 · 从平方非负出发</h3></div>
+    <div class="slide-body">
+      <div class="formula">$(a-b)^2\geq 0\ \Rightarrow\ \boxed{a^2+b^2\geq 2ab}\ (a,b\in\mathbb{R})$，当 $a=b$ 取等</div>
+      <div class="formula">$\boxed{\dfrac{a+b}{2}\geq\sqrt{ab}}\ (a,b&gt;0)$，当 $a=b$ 取等</div>
+      <div class="deep">💡 等价变形：$a+b\geq 2\sqrt{ab}$；$ab\leq\left(\dfrac{a+b}{2}\right)^2$；$ab\leq\dfrac{a^2+b^2}{2}$。</div>
+    </div>
+  </section>
+
+  <!-- 15 几何意义（图2） -->
+  <section class="slide" data-narration="这个式子还能用几何来证明。在一条线段上取分点，以它为直径作半圆，圆心到端点的半径就是算术平均数 a 加 b 除以 2，过分点作垂线交半圆于一点，这条垂线段就是几何平均数根号 ab。在直角三角形中，斜边不小于直角边，于是算术平均数不小于几何平均数。等号成立，当且仅当分点落在中点，也就是 a 等于 b。">
+    <div class="slide-head"><span class="sec">四</span><h3>几何意义 · 数形结合记忆</h3></div>
+    <div class="slide-body">
+      <div class="fig">
+        <img src="images/不等式-基本不等式几何意义.svg" alt="基本不等式几何意义">
+        <div class="cap">半径 = 算术平均数 $\frac{a+b}{2}$，垂线段 = 几何平均数 $\sqrt{ab}$</div>
+      </div>
+      <div class="tip">📐 斜边（半径）不小于直角边（垂线），即 $\dfrac{a+b}{2}\geq\sqrt{ab}$，当 $a=b$ 取等。</div>
+    </div>
+  </section>
+
+  <!-- 16 一正二定三相等 + 例题5/6【互动】 -->
+  <section class="slide" data-narration="用基本不等式求最值，必须同时满足三个条件，缺一不可：一正，两数都为正；二定，要么和为定值求积最大，要么积为定值求和最小；三相等，等号能否取到。来，例题五你先暂停自己算，x 大于 0 求 x 加 x 分之一最小值，你算出来了吗？好，答案是 2，等号当 x 等于 1 时取到。例题六，求 x 乘括号 1 减 x 最大值，和为定值 1，最大值四分之一。">
+    <div class="slide-head"><span class="sec">四</span><h3>三字诀：一正 · 二定 · 三相等</h3></div>
+    <div class="slide-body">
+      <div class="card"><b>一正</b>：两数都为正　<b>二定</b>：和有定求积最大 / 积有定求和最小　<b>三相等</b>：等号能取到</div>
+      <div class="pause">
+        <div class="icon">✋</div>
+        <div class="txt"><b>暂停推导</b><p>例题5：已知 $x&gt;0$，求 $x+\dfrac1x$ 的最小值，自己先算。</p></div>
+      </div>
+      <div class="formula">例5：$x+\dfrac1x\geq 2\sqrt{x\cdot\dfrac1x}=2$，当 $x=1$ 取等，最小值 $2$</div>
+      <div class="formula">例6：$x(1-x)\leq\left(\dfrac{x+1-x}{2}\right)^2=\dfrac14$，当 $x=\dfrac12$ 取等，最大值 $\dfrac14$</div>
+    </div>
+  </section>
+
+  <!-- 17 "1"的代换 例题7 -->
+  <section class="slide" data-narration="技巧一，一的代换。当条件是和为定值、目标是分式之和时，把目标式乘上一个一巧妙搭桥。例题七，x、y 都大于 0，x 加 y 等于 1，求 x 分之一加 y 分之四的最小值。把目标式乘上 x 加 y，展开后用基本不等式，得到最小值 9，等号当 y 等于 2x，结合 x 加 y 等于 1 取到。">
+    <div class="slide-head"><span class="sec">四</span><h3>技巧一 · 「1」的代换</h3></div>
+    <div class="slide-body">
+      <div class="card"><b>例题7</b>：$x,y&gt;0$，$x+y=1$，求 $\dfrac1x+\dfrac4y$ 的最小值</div>
+      <div class="formula">$\dfrac1x+\dfrac4y=\left(\dfrac1x+\dfrac4y\right)(x+y)=5+\dfrac{y}{x}+\dfrac{4x}{y}\geq 5+4=9$</div>
+      <div class="deep">💡 当 $\dfrac{y}{x}=\dfrac{4x}{y}$ 即 $y=2x$，结合 $x+y=1$ 得 $x=\dfrac13,y=\dfrac23$ 取等，最小值 $9$。</div>
+    </div>
+  </section>
+
+  <!-- 18 配凑 例题8 -->
+  <section class="slide" data-narration="技巧二，配凑固定结构。目标式不是现成的定值时，先配凑。例题八，x 大于 1，求 x 加 x 减 1 分之一的最小值。把 x 拆成括号 x 减 1 加 1，凑出积为定值的结构，用基本不等式得到最小值 3，等号当 x 等于 2 时取到。">
+    <div class="slide-head"><span class="sec">四</span><h3>技巧二 · 配凑固定结构</h3></div>
+    <div class="slide-body">
+      <div class="card"><b>例题8</b>：已知 $x&gt;1$，求 $y=x+\dfrac{1}{x-1}$ 的最小值</div>
+      <div class="formula">$y=(x-1)+\dfrac{1}{x-1}+1\geq 2\sqrt{(x-1)\cdot\dfrac{1}{x-1}}+1=3$</div>
+      <div class="deep">💡 当 $x-1=\dfrac{1}{x-1}$ 即 $x=2$ 时取等，最小值为 $3$。</div>
+    </div>
+  </section>
+
+  <!-- 19 绝对值不等式（图3）+ 三角不等式 + 例题9 -->
+  <section class="slide" data-narration="拓展专题。绝对值表示到原点的距离。绝对值 x 小于 a，等价于负 a 小于 x 小于 a；大于 a，等价于 x 小于负 a 或 x 大于 a。还有三角不等式：a 加 b 的绝对值，夹在 a 的绝对值减 b 的绝对值的绝对值，和 a 的绝对值加 b 的绝对值之间。例题九，解绝对值 2x 减 1 小于等于 3，得到解集是负 1 到 2 的闭区间。">
+    <div class="slide-head"><span class="sec">五</span><h3>绝对值不等式</h3></div>
+    <div class="slide-body">
+      <div class="cols">
+        <div class="col">
+          <div class="formula">$|x|&lt;a\Longleftrightarrow -a&lt;x&lt;a$</div>
+          <div class="formula">$|x|&gt;a\Longleftrightarrow x&lt;-a\ \text{或}\ x&gt;a$</div>
+          <div class="card"><b>例题9</b>：$|2x-1|\leq 3$</div>
+          <div class="formula">$-3\leq 2x-1\leq 3\ \Rightarrow\ -1\leq x\leq 2$</div>
+        </div>
+        <div class="col">
+          <div class="fig">
+            <img src="images/不等式-绝对值距离.svg" alt="绝对值距离">
+            <div class="cap">$|x|$ = 数轴上点 $x$ 到原点的距离</div>
+          </div>
+          <div class="deep">💡 三角不等式：$\big||a|-|b|\big|\leq|a\pm b|\leq|a|+|b|$</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 20 零点分段法 例题10 -->
+  <section class="slide" data-narration="多个绝对值相加，用零点分段法。例题十，解绝对值 x 减 1 加绝对值 x 加 3 大于等于 4。两个零点是负 3 和 1，把数轴分成三段分别去绝对值讨论。结果三段合起来，解集是全体实数。零点分段法，是处理多绝对值的通用武器。">
+    <div class="slide-head"><span class="sec">五</span><h3>零点分段法</h3></div>
+    <div class="slide-body">
+      <div class="card"><b>例题10</b>：$|x-1|+|x+3|\geq 4$，零点 $x=-3,\ 1$</div>
+      <div class="formula">$x&lt;-3$：$-2x-2\geq 4\ \Rightarrow\ x\leq -3$</div>
+      <div class="formula">$-3\leq x&lt;1$：$4\geq 4$，恒成立</div>
+      <div class="formula">$x\geq 1$：$2x+2\geq 4\ \Rightarrow\ x\geq 1$</div>
+      <div class="deep">💡 三段合并，解集为 $\mathbb{R}$（全体实数）。</div>
+    </div>
+  </section>
+
+  <!-- 21 分式不等式 例题11 -->
+  <section class="slide" data-narration="分式不等式，核心思想化分式为整式，注意分母不能为 0。x 减 a 除以 x 减 b 大于 0，等价于括号 x 减 a 括号 x 减 b 大于 0 且 x 不等于 b。例题十一，解 x 减 2 除以 x 加 1 小于等于 0，等价于分子分母乘积小于等于 0 且分母不为 0，解集是负 1 到 2，左开右闭。">
+    <div class="slide-head"><span class="sec">五</span><h3>分式不等式</h3></div>
+    <div class="slide-body">
+      <div class="formula">$\dfrac{x-a}{x-b}&gt;0\Longleftrightarrow (x-a)(x-b)&gt;0\ \text{且}\ x\neq b$</div>
+      <div class="card"><b>例题11</b>：解 $\dfrac{x-2}{x+1}\leq 0$</div>
+      <div class="formula">$\begin{cases}(x-2)(x+1)\leq 0\\ x+1\neq 0\end{cases}\ \Rightarrow\ -1&lt;x\leq 2$</div>
+      <div class="deep">💡 解集 $(-1,\,2]$，注意分母 $x+1\neq 0$，左端开区间。</div>
+    </div>
+  </section>
+
+  <!-- 22 穿针引线（图4）+ 例题12 -->
+  <section class="slide" data-narration="高次不等式，用穿针引线法：把每个根从小到大标在数轴上，从最右上方开始自右向左穿，奇次因式的根穿过去，偶次因式的根折回。轴上方对应大于 0。例题十二，解括号 x 减 1 括号 x 加 2 括号 x 减 3 大于 0，三个根负 2、1、3，自右上穿，取上方，解集是负 2 到 1 并上 3 到正无穷。">
+    <div class="slide-head"><span class="sec">五</span><h3>高次不等式 · 穿针引线法</h3></div>
+    <div class="slide-body">
+      <div class="cols">
+        <div class="col">
+          <div class="fig">
+            <img src="images/不等式-穿针引线.svg" alt="穿针引线">
+            <div class="cap">奇穿偶回 · 自右上向左 · 上方为 &gt;0</div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card"><b>例题12</b>：$(x-1)(x+2)(x-3)&gt;0$</div>
+          <div class="formula">三根 $-2,\ 1,\ 3$</div>
+          <div class="formula">自右上穿，取轴上方</div>
+          <div class="deep">💡 解集 $(-2,1)\cup(3,+\infty)$。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 23 柯西不等式 -->
+  <section class="slide" data-narration="最后看柯西不等式，高维利器。二维形式：a 平方加 b 平方，乘 c 平方加 d 平方，大于等于 a c 加 b d 的平方，当且仅当 a 比 c 等于 b 比 d 取等。它在已知条件下求分式最值时威力巨大。更系统的套路，可以看配套的柯西不等式求最值笔记。">
+    <div class="slide-head"><span class="sec">五</span><h3>柯西不等式 · 高维利器</h3></div>
+    <div class="slide-body">
+      <div class="formula">$(a^2+b^2)(c^2+d^2)\geq (ac+bd)^2$</div>
+      <div class="tip">🎯 当 $\dfrac{a}{c}=\dfrac{b}{d}$ 时取等号。求分式最值时威力巨大。</div>
+      <div class="deep">💡 衔接：更系统的配凑、权方和、待定系数等套路，见配套《柯西不等式求最值》笔记。</div>
+    </div>
+  </section>
+
+  <!-- 24 数学思想 -->
+  <section class="slide" data-narration="不等式全章贯穿四条数学思想。第一，数形结合：一元二次翻译成抛物线，均值翻译成半圆，绝对值翻译成数轴距离，看到式子先在脑中画几何画像。第二，转化与化归：分式化整式、高次化穿针、绝对值化分段、求最值化定值。第三，分类讨论：参数不明时分类，不重不漏。第四，函数与方程思想：不等式常挂靠函数图像解决。">
+    <div class="slide-head"><span class="sec">六</span><h3>数学思想深度解析</h3></div>
+    <div class="slide-body">
+      <table>
+        <thead><tr><th>思想</th><th>在不等式中的体现</th></tr></thead>
+        <tbody>
+          <tr><td><b>数形结合</b></td><td>二次→抛物线，均值→半圆，绝对值→数轴距离</td></tr>
+          <tr><td><b>转化与化归</b></td><td>分式→整式，高次→穿针，绝对值→分段，最值→定值</td></tr>
+          <tr><td><b>分类讨论</b></td><td>参数不明（二次项、判别式、区间）时分类，不重不漏</td></tr>
+          <tr><td><b>函数与方程</b></td><td>不等式常挂靠函数图像解决</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 25 通关清单 / 收尾 -->
+  <section class="slide slide-cover" data-narration="到这里，不等式整章就复习完了。给你一份通关清单，合上书自测：八大性质能背吗？乘负变号成条件反射了吗？三个二次的图像法和口诀记牢了吗？一正二定三相等会套吗？绝对值、分式、高次穿针，三种解法分得清吗？如果哪条还卡，回到对应页再推一遍。真正吃透不等式，你后面的函数、导数都会顺很多。加油！">
+    <div class="kicker">复 习 通 关 清 单</div>
+    <h1 style="font-size:46px">你能独立做到吗？</h1>
+    <div class="divider"></div>
+    <div class="meta" style="text-align:left; max-width:820px; line-height:2.1;">
+      ☑ 八大性质 + 三大易错点（乘负变号），记牢<br>
+      ☑ 三个二次：图像法 + 口诀「大于取两边、小于取中间」<br>
+      ☑ 基本不等式：一正二定三相等，四种结构一眼识别<br>
+      ☑ 绝对值 / 分式 / 高次穿针，三种解法分得清<br>
+      ☑ 数学思想：数形结合 · 转化 · 分类讨论 · 函数方程
+    </div>
+    <div class="divider" style="margin-top:26px"></div>
+    <div class="meta">真正吃透不等式，函数、导数都会顺很多。加油！</div>
+  </section>
+
+  <!-- 页脚 -->
+  <div id="footer">
+    <span class="brand">不等式复习讲解</span>
+    <span id="pagenum">1 / 25</span>
+  </div>
+
+  <!-- 导航 -->
+  <div class="nav">
+    <button id="prev" title="上一页 (←)">‹</button>
+    <button id="next" title="下一页 (→ / 空格)">›</button>
+  </div>
+  <div id="hint">← → 翻页 · 空格下一页 · 点击左右半屏翻页</div>
+
+</div>
+
+<script>
+(function(){
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  let idx = 0;
+
+  const params = new URLSearchParams(location.search);
+  const startSlide = parseInt(params.get('slide'), 10);
+  if (params.get('autohide') === '1') document.body.classList.add('autohide');
+  if (!isNaN(startSlide) && startSlide >= 1 && startSlide <= total) idx = startSlide - 1;
+
+  const progress = document.getElementById('progress');
+  const pagenum = document.getElementById('pagenum');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+
+  function render(){
+    slides.forEach((s,i)=> s.classList.toggle('active', i===idx));
+    progress.style.width = ((idx+1)/total*100) + '%';
+    pagenum.textContent = (idx+1) + ' / ' + total;
+    prevBtn.disabled = (idx===0);
+    nextBtn.disabled = (idx===total-1);
+  }
+  function go(n){ idx = Math.max(0, Math.min(total-1, n)); render(); }
+
+  prevBtn.addEventListener('click', e=>{ e.stopPropagation(); go(idx-1); });
+  nextBtn.addEventListener('click', e=>{ e.stopPropagation(); go(idx+1); });
+
+  document.addEventListener('keydown', e=>{
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){ e.preventDefault(); go(idx+1); }
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); go(idx-1); }
+    else if(e.key==='Home'){ go(0); }
+    else if(e.key==='End'){ go(total-1); }
+  });
+
+  document.getElementById('stage').addEventListener('click', e=>{
+    if(e.target.closest('.nav')) return;
+    const x = e.clientX;
+    if(x < window.innerWidth*0.5) go(idx-1); else go(idx+1);
+  });
+
+  function fit(){
+    const s = Math.min(window.innerWidth/1280, window.innerHeight/720);
+    document.getElementById('stage').style.transform = 'translate(-50%,-50%) scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+  render();
+})();
+</script>
+</body>
+</html>
