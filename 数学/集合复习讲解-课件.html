@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>集合复习讲解</title>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true,
+    tags: 'none'
+  },
+  svg: { fontCache: 'global', scale: 1.05 },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --primary:#312e81; --accent:#4f46e5; --accent-light:#eef2ff; --accent-border:#c7d2fe;
+    --text:#2d3748; --muted:#718096; --border:#e2e8f0; --bg-light:#f7fafc;
+    --success:#38a169; --danger:#e53e3e; --warning:#dd6b20; --warn-bg:#fffaf0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:100%;height:100%;overflow:hidden;background:#0f172a;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","WenQuanYi Micro Hei",sans-serif;
+    color:var(--text);
+  }
+  #stage{
+    position:absolute; left:50%; top:50%;
+    width:1280px; height:720px;
+    transform:translate(-50%,-50%) scale(1);
+    transform-origin:center center;
+    background:#ffffff;
+    box-shadow:0 0 40px rgba(0,0,0,.4);
+    overflow:hidden;
+  }
+  .slide{
+    position:absolute; inset:0;
+    padding:36px 60px 52px;
+    display:none;
+    flex-direction:column;
+    background:#ffffff;
+    opacity:0;
+    transition:opacity .35s ease;
+  }
+  .slide.active{ display:flex; opacity:1; }
+
+  #progress{ position:absolute; top:0; left:0; height:6px; background:var(--accent); width:0; z-index:50; transition:width .35s; }
+
+  .slide-cover, .slide-divider{ justify-content:center; align-items:center; text-align:center; }
+  .slide-cover{ background:linear-gradient(135deg,#312e81 0%,#4f46e5 100%); color:#fff; }
+  .slide-cover .kicker{ font-size:22px; letter-spacing:6px; opacity:.85; margin-bottom:18px;}
+  .slide-cover h1{ font-size:64px; font-weight:800; line-height:1.2; margin-bottom:22px; letter-spacing:2px;}
+  .slide-cover .sub{ font-size:26px; opacity:.92; margin-bottom:36px;}
+  .slide-cover .meta{ font-size:18px; opacity:.85; line-height:2;}
+  .slide-cover .divider{ width:160px;height:5px;background:#fff;opacity:.6;margin:0 auto 30px;border-radius:3px;}
+
+  .slide-divider{ background:linear-gradient(135deg,#4f46e5 0%,#312e81 100%); color:#fff;}
+  .slide-divider .num{ font-size:30px; opacity:.7; letter-spacing:4px; margin-bottom:10px;}
+  .slide-divider h2{ font-size:56px; font-weight:800; letter-spacing:3px;}
+  .slide-divider .en{ font-size:20px; opacity:.8; margin-top:16px; letter-spacing:2px;}
+
+  .slide-head{ display:flex; align-items:baseline; gap:16px; border-bottom:3px solid var(--accent); padding-bottom:9px; margin-bottom:12px;}
+  .slide-head .sec{ font-size:17px; color:var(--accent); font-weight:700; background:var(--accent-light); padding:3px 11px; border-radius:6px;}
+  .slide-head h3{ font-size:30px; color:var(--primary); font-weight:700;}
+  .slide-body{ flex:1; display:flex; flex-direction:column; justify-content:center; min-height:0; }
+
+  p{ font-size:21px; line-height:1.65; margin-bottom:8px; text-align:justify;}
+  .lead{ font-size:23px; color:#374151; line-height:1.75;}
+  ul,ol{ margin:0 0 8px 26px; font-size:21px; line-height:1.7;}
+  li{ margin-bottom:5px;}
+  strong{ color:var(--primary); }
+
+  .formula{ background:var(--accent-light); border-left:5px solid var(--accent); border-radius:0 10px 10px 0; padding:9px 22px; margin:9px 0; text-align:center; font-size:23px;}
+  .formula-concl{ background:#fffaf0; border-left:5px solid var(--warning);}
+  .MathJax{ font-size:1.05em !important; }
+
+  table{ width:100%; border-collapse:collapse; margin:10px 0; font-size:20px;}
+  th{ background:var(--accent); color:#fff; padding:7px 12px; text-align:center; font-weight:600;}
+  td{ padding:7px 12px; border:1px solid var(--border); text-align:center; vertical-align:middle;}
+  tr:nth-child(even) td{ background:var(--bg-light);}
+
+  .card{ background:var(--accent-light); border:1px solid var(--accent-border); border-radius:12px; padding:12px 20px; margin:10px 0;}
+  .tip{ background:#eef2ff; border-left:5px solid var(--accent); border-radius:0 10px 10px 0; padding:10px 20px; margin:10px 0; font-size:20px; color:#3730a3;}
+  .deep{ background:#f0fff4; border-left:5px solid var(--success); border-radius:0 10px 10px 0; padding:10px 20px; margin:10px 0; font-size:20px; color:#22543d;}
+
+  .pause{
+    background:var(--warn-bg); border:2px dashed var(--warning); border-radius:14px;
+    padding:12px 22px; margin:12px 0; display:flex; align-items:center; gap:16px;
+    box-shadow:0 4px 14px rgba(221,107,32,.12);
+  }
+  .pause .icon{ font-size:38px; line-height:1; }
+  .pause .txt b{ color:var(--warning); font-size:22px; }
+  .pause .txt p{ font-size:19px; color:#744210; margin:3px 0 0; }
+
+  .cols{ display:flex; gap:28px; align-items:center; }
+  .col{ flex:1; }
+
+  /* 复习目标卡片网格 */
+  .goals{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px 26px; margin-top:6px;}
+  .goal{ display:flex; gap:12px; align-items:flex-start; background:var(--accent-light); border:1px solid var(--accent-border); border-radius:12px; padding:11px 16px;}
+  .goal .no{ flex:none; width:30px; height:30px; border-radius:50%; background:var(--accent); color:#fff; font-weight:700; font-size:16px; display:flex; align-items:center; justify-content:center;}
+  .goal .t{ font-size:19px; color:var(--text); line-height:1.45;}
+  .goal .t b{ color:var(--primary); }
+
+  /* 数集嵌套图 */
+  .nsets{ display:flex; justify-content:center; align-items:center; }
+  .nbox{ border:2.5px solid var(--accent); border-radius:14px; padding:9px 16px; margin:4px; background:#fff; text-align:center; font-weight:700; color:var(--primary);}
+  .nbox .lab{ font-size:19px; }
+  .nbox .sub{ font-size:14px; color:var(--muted); font-weight:500; margin-top:2px;}
+  .nbox.r{ background:#eef2ff; }
+  .nbox.q{ background:#e0e7ff; }
+  .nbox.z{ background:#c7d2fe; }
+  .nbox.n{ background:#a5b4fc; }
+  .nbox.np{ background:#818cf8; color:#fff; }
+
+  /* Venn 图容器 */
+  .venn{ text-align:center; }
+  .venn svg{ max-width:100%; }
+
+  #footer{ position:absolute; bottom:0; left:0; right:0; height:40px; display:flex; align-items:center; justify-content:space-between; padding:0 30px; font-size:15px; color:#94a3b8; background:rgba(247,250,252,.85); border-top:1px solid var(--border); z-index:40;}
+  #footer .brand{ font-weight:600; color:var(--accent); }
+
+  .nav{ position:absolute; bottom:48px; right:40px; display:flex; gap:12px; z-index:45;}
+  .nav button{ width:54px; height:54px; border-radius:50%; border:none; background:var(--accent); color:#fff; font-size:24px; cursor:pointer; box-shadow:0 3px 10px rgba(79,70,229,.4); display:flex; align-items:center; justify-content:center;}
+  .nav button:hover{ background:var(--primary); }
+  .nav button:disabled{ background:#cbd5e0; cursor:default; box-shadow:none;}
+
+  #hint{ position:absolute; bottom:48px; left:40px; font-size:14px; color:#94a3b8; z-index:45;}
+
+  body.autohide #progress, body.autohide #footer, body.autohide .nav, body.autohide #hint{ display:none !important; }
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <div id="progress"></div>
+
+  <!-- 0 封面 -->
+  <section class="slide slide-cover active" data-narration="同学们好，欢迎来到集合章节复习课。集合是高中数学的第一块基石，函数、不等式、概率统计全都建立在它的上面。这一讲，我们不讲新概念，而是把集合整章的核心知识、易错陷阱和高考考法，系统地串一遍，帮你形成一张清晰的知识网。中间我会请你暂停视频，亲手算一两道典型题。准备好纸笔，我们开始。">
+    <div class="kicker">高 中 数 学 · 必 修 一 · 第 一 章</div>
+    <h1>集合复习讲解</h1>
+    <div class="sub">核心概念 · 三大运算 · 逻辑用语 · 高考考法</div>
+    <div class="divider"></div>
+    <div class="meta">
+      高一同步巩固 · 高考一轮复习通用<br>
+      重点 · 易错点 · 题型归纳 · 深度理解
+    </div>
+  </section>
+
+  <!-- 1 复习目标 -->
+  <section class="slide" data-narration="先说清楚这一讲要复习什么。第一，集合的两种表示法和元素与集合的关系。第二，集合的三条性质——确定性、互异性、无序性。第三，常用数集和它们之间的包含关系。第四，子集、真子集、空集，以及子集个数公式。第五，交并补三种运算和德摩根定律。第六，逻辑用语里的量词和充分必要条件。最后，我会带你过易错点和高考考法。跟着这条线走，集合就能稳稳拿分。">
+    <div class="slide-head"><span class="sec">总览</span><h3>复习目标 · 知识地图</h3></div>
+    <div class="slide-body">
+      <div class="goals">
+        <div class="goal"><span class="no">1</span><span class="t"><b>表示法与元素关系</b><br>列举法 / 描述法，∈ 与 ∉</span></div>
+        <div class="goal"><span class="no">2</span><span class="t"><b>集合三性质</b><br>确定性 · 互异性 · 无序性</span></div>
+        <div class="goal"><span class="no">3</span><span class="t"><b>常用数集</b><br>N / Z / Q / R 与包含关系</span></div>
+        <div class="goal"><span class="no">4</span><span class="t"><b>集合间关系</b><br>子集 · 真子集 · 空集 · 2ⁿ</span></div>
+        <div class="goal"><span class="no">5</span><span class="t"><b>三大运算</b><br>交 · 并 · 补 + 德摩根</span></div>
+        <div class="goal"><span class="no">6</span><span class="t"><b>逻辑用语</b><br>量词 · 充分必要条件 · 四种命题</span></div>
+      </div>
+      <div class="tip" style="margin-top:18px;">🎯 收尾还有「易错点」与「高考考法」两站，确保这一章不丢分。</div>
+    </div>
+  </section>
+
+  <!-- 2 集合是什么 + 表示法 -->
+  <section class="slide" data-narration="先回顾集合是什么。数学里的集合，就是把具有某种共同特征的对象放在一起形成的整体。它有两种表示法。第一种是列举法，把元素一一列举出来，比如 A 是由 1、2、3、4、5 这五个数组成的集合。第二种是描述法，写出元素满足的条件，比如 C 是所有小于 10 的正整数的集合。描述法像一个筛子，只有符合条件的对象才能进来，不符合的被挡在外面。">
+    <div class="slide-head"><span class="sec">一</span><h3>集合是什么 · 两种表示法</h3></div>
+    <div class="slide-body">
+      <p class="lead">把具有<b>共同特征</b>的对象放在一起形成的整体，就是集合。</p>
+      <div class="cols">
+        <div class="col">
+          <div class="card"><b>① 列举法</b>——元素一一写出，花括号包裹</div>
+          <div class="formula">$A=\{1,2,3,4,5\}$<br>$B=\{\text{猫},\text{狗},\text{鸟},\text{鱼}\}$</div>
+        </div>
+        <div class="col">
+          <div class="card"><b>② 描述法</b>——写出元素满足的条件（筛选器）</div>
+          <div class="formula">$C=\{x\mid x\text{ 是小于 }10\text{ 的正整数}\}$<br>$D=\{x\mid x^2-4=0\}$</div>
+        </div>
+      </div>
+      <div class="deep">💡 描述法的关键是「规则」：符合条件才能成为元素，不符合就被筛掉。</div>
+    </div>
+  </section>
+
+  <!-- 3 元素与集合的关系 -->
+  <section class="slide" data-narration="集合确定后，单个对象和它是两种关系。a 是 A 的元素，记作 a 属于 A；不是，就记作 a 不属于 A。注意，属于符号用在小写字母和集合之间，不能写成把集合当元素的错法。来个小练习：A 是由 1、3、5、7 这四个数组成的集合，那么 1 属于 A 是对的，2 属于 A 是错的，说 7 不属于 A 也是错的。判断时先把集合里的元素看清楚。">
+    <div class="slide-head"><span class="sec">一</span><h3>元素与集合的关系</h3></div>
+    <div class="slide-body">
+      <div class="formula">$a\in A\ $（a 是 A 的元素，读作「a 属于 A」）<br>$a\notin A\ $（a 不是 A 的元素，读作「a 不属于 A」）</div>
+      <div class="card"><b>例题：</b>设 $A=\{1,3,5,7\}$，判断下列关系</div>
+      <table>
+        <thead><tr><th>判断式</th><th>结论</th><th>判断式</th><th>结论</th></tr></thead>
+        <tbody>
+          <tr><td>$1\in A$</td><td style="color:var(--success);font-weight:700;">✅ 正确</td><td>$2\in A$</td><td style="color:var(--danger);font-weight:700;">❌ 错误</td></tr>
+          <tr><td>$7\notin A$</td><td style="color:var(--danger);font-weight:700;">❌ 错误</td><td colspan="2" style="color:var(--muted);">先把元素列清：$A=\{1,3,5,7\}$</td></tr>
+        </tbody>
+      </table>
+      <div class="tip">⚠️ 属于符号用在「元素—集合」之间，不能把集合当元素写。</div>
+    </div>
+  </section>
+
+  <!-- 4 集合三性质 -->
+  <section class="slide" data-narration="集合有三条铁律。第一，确定性：一个对象要么属于集合，要么不属于，没有中间状态。所以『高个子的人』不能构成集合，因为高矮没有标准。第二，互异性：元素互不相同，集合会自动去重，比如由 1、2、2、3 组成的集合，要写成由 1、2、3 组成的集合。第三，无序性：元素没有顺序，由 1、2、3 组成的集合和由 3、2、1 组成的集合是同一个集合。顺序是数列才关心的，集合只关心装了哪些元素。">
+    <div class="slide-head"><span class="sec">二</span><h3>集合的三条性质</h3></div>
+    <div class="slide-body">
+      <table>
+        <thead><tr><th>性质</th><th>含义</th><th>反例 / 要点</th></tr></thead>
+        <tbody>
+          <tr><td><b>确定性</b></td><td>对象要么属于、要么不属于，无中间态</td><td>「高个子的人」不能成集合（无标准）</td></tr>
+          <tr><td><b>互异性</b></td><td>元素互不相同，自动去重</td><td>$\{1,2,2,3\}\to\{1,2,3\}$</td></tr>
+          <tr><td><b>无序性</b></td><td>元素无顺序之分</td><td>$\{1,2,3\}=\{3,2,1\}$</td></tr>
+        </tbody>
+      </table>
+      <div class="deep">💡 集合只关心「装了哪些元素」，不关心顺序——顺序是数列、列表才在意的。</div>
+    </div>
+  </section>
+
+  <!-- 5 常用数集 + 包含关系 -->
+  <section class="slide" data-narration="数学里有一组固定数集，符号要记牢。N 是自然数集，包含 0；N 星号，也叫 N 正，是正整数集，从 1 开始；Z 是整数集，包含负整数和 0；Q 是有理数集，能写成分数；R 是实数集，包含有理数和无理数。记忆窍门：N 取英文 natural、自然的首字母；Z 取中文『整』的拼音首字母；Q 是 quotient、商；R 是 real、真实。它们层层包含：正整数集 包含于 自然数集，包含于 整数集，包含于 有理数集，包含于 实数集。">
+    <div class="slide-head"><span class="sec">三</span><h3>常用数集与包含关系</h3></div>
+    <div class="slide-body">
+      <div class="cols">
+        <div class="col">
+          <table>
+            <thead><tr><th>符号</th><th>名称</th><th>记忆</th></tr></thead>
+            <tbody>
+              <tr><td>$\mathbb{N}$</td><td>自然数集</td><td>N·natural</td></tr>
+              <tr><td>$\mathbb{N}^*$</td><td>正整数集</td><td>从 1 起</td></tr>
+              <tr><td>$\mathbb{Z}$</td><td>整数集</td><td>Z·整</td></tr>
+              <tr><td>$\mathbb{Q}$</td><td>有理数集</td><td>Q·quotient</td></tr>
+              <tr><td>$\mathbb{R}$</td><td>实数集</td><td>R·real</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col">
+          <div class="nsets">
+            <div class="nbox r"><span class="lab">R 实数</span>
+              <div class="nbox q"><span class="lab">Q 有理数</span>
+                <div class="nbox z"><span class="lab">Z 整数</span>
+                  <div class="nbox n"><span class="lab">N 自然数</span>
+                    <div class="nbox np"><span class="lab">N* 正整数</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="formula" style="margin-top:6px;">$\mathbb{N}^*\subsetneq\mathbb{N}\subsetneq\mathbb{Z}\subsetneq\mathbb{Q}\subsetneq\mathbb{R}$</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 集合间关系：子集/真子集/相等 -->
+  <section class="slide" data-narration="两个集合之间，常见三种关系。子集：A 的元素全在 B 里，记 A 包含于 B，A 是 B 的一部分。真子集：A 包含于 B 而且 A 不等于 B，记 A 真包含于 B，意思是 B 里至少多一个 A 没有的元素。相等：A 包含于 B 且 B 包含于 A，两个集合元素完全相同，就相等。举个例子：A 是由 1、2 组成的集合，B 是由 1、2、3 组成的集合，那么 A 真包含于 B。">
+    <div class="slide-head"><span class="sec">四</span><h3>集合间关系：子集 · 真子集 · 相等</h3></div>
+    <div class="slide-body">
+      <table>
+        <thead><tr><th>关系</th><th>定义</th><th>记号</th><th>直观</th></tr></thead>
+        <tbody>
+          <tr><td><b>子集</b></td><td>A 的元素都在 B 中</td><td>$A\subseteq B$</td><td>A 是 B 的一部分</td></tr>
+          <tr><td><b>真子集</b></td><td>$A\subseteq B$ 且 $A\neq B$</td><td>$A\subsetneq B$</td><td>B 至少多一个元素</td></tr>
+          <tr><td><b>相等</b></td><td>$A\subseteq B$ 且 $B\subseteq A$</td><td>$A=B$</td><td>元素完全相同</td></tr>
+        </tbody>
+      </table>
+      <div class="tip" style="margin-top:16px;">📌 示例：$A=\{1,2\},\ B=\{1,2,3\}$，则 $A\subsetneq B$（A 是 B 的真子集）</div>
+    </div>
+  </section>
+
+  <!-- 7 空集 + 子集个数 -->
+  <section class="slide" data-narration="空集，是不含任何元素的集合，书写上是一个圆圈中间加一条斜杠，但它非常重要。两条性质务必记住：空集是任何集合的子集；空集是任何非空集合的真子集。为什么空集是任何集合的子集？因为空集没有元素需要验证，这句话在逻辑上是空洞成立的。再来一个高频考点：一个有 n 个元素的集合，子集有 2 的 n 次方个，真子集有 2 的 n 次方减 1 个。道理是每个元素都有『进子集』或『不进』两种选择，乘起来就是 2 的 n 次方。">
+    <div class="slide-head"><span class="sec">四</span><h3>空集 · 子集个数公式</h3></div>
+    <div class="slide-body">
+      <div class="card"><b>空集 $\emptyset$</b>：不含任何元素的集合</div>
+      <div class="formula">$\emptyset\subseteq A$（任何集合的子集）<br>$\emptyset\subsetneq A$（任何<b>非空</b>集合的真子集）</div>
+      <div class="deep">💡 子集个数定理：含 $n$ 个元素的集合，子集有 $2^n$ 个，真子集有 $2^n-1$ 个。</div>
+      <p style="text-align:center;color:var(--muted);font-size:19px;">理由：每个元素「进 / 不进」子集，共 $n$ 个二选一 → $2\times2\times\cdots\times2=2^n$</p>
+    </div>
+  </section>
+
+  <!-- 8 子集个数例题 -->
+  <section class="slide" data-narration="练一道。集合 S 是由 a、b、c 三个元素组成的集合，子集有 2 的三次方等于 8 个：零个元素是空集；一个元素的有 a、b、c 三个；两个元素的有 a b、a c、b c 三个；三个元素的是 a b c 自己。真子集去掉 a b c 这个，共 7 个；非空子集去掉空集，也是 7 个。这种题高考常考，数一数别漏空集，也别把空集漏算在真子集之外。">
+    <div class="slide-head"><span class="sec">四</span><h3>例题 · 子集个数</h3></div>
+    <div class="slide-body">
+      <p class="lead">集合 $S=\{a,b,c\}$ 有 $3$ 个元素 → 子集共 $2^3=8$ 个：</p>
+      <table>
+        <thead><tr><th>元素个数</th><th>子集</th><th>数量</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>$\emptyset$</td><td>1</td></tr>
+          <tr><td>1</td><td>$\{a\},\{b\},\{c\}$</td><td>3</td></tr>
+          <tr><td>2</td><td>$\{a,b\},\{a,c\},\{b,c\}$</td><td>3</td></tr>
+          <tr><td>3</td><td>$\{a,b,c\}$</td><td>1</td></tr>
+        </tbody>
+      </table>
+      <div class="tip">🔢 子集 8 个 · 真子集 7 个（去掉自身）· 非空子集 7 个（去掉空集）</div>
+    </div>
+  </section>
+
+  <!-- 9 交集 -->
+  <section class="slide" data-narration="集合运算有三种。先看交集，A 交 B，取既属于 A 又属于 B 的元素，也就是两个集合的公共部分。比如 A 是由 1、2、3、4 组成的集合，B 是由 3、4、5、6 组成的集合，交集就是由 3、4 组成的集合。性质：交集满足交换律，A 交 B 等于 B 交 A；自身相交还是自己；和空集相交是空集。">
+    <div class="slide-head"><span class="sec">五</span><h3>交集 $A\cap B$</h3></div>
+    <div class="slide-body">
+      <div class="formula">$A\cap B=\{x\mid x\in A\ \text{且}\ x\in B\}$（公共部分）</div>
+      <div class="card"><b>例题：</b>$A=\{1,2,3,4\},\ B=\{3,4,5,6\}$，则 $A\cap B=\{3,4\}$</div>
+      <div class="deep">💡 性质：交换律 $A\cap B=B\cap A$ · 幂等 $A\cap A=A$ · $A\cap\emptyset=\emptyset$</div>
+    </div>
+  </section>
+
+  <!-- 10 并集 -->
+  <section class="slide" data-narration="再看并集，A 并 B，取属于 A 或者属于 B 的所有元素，也就是把两个集合合并，注意要去重。A 是由 1、2、3 组成的集合，B 是由 3、4、5 组成的集合，并集就是由 1、2、3、4、5 组成的集合。性质同样是交换律，自身相并还是自己，和空集相并等于自己。这里最容易犯的错是重复元素没去重，记住集合自动去重。">
+    <div class="slide-head"><span class="sec">五</span><h3>并集 $A\cup B$</h3></div>
+    <div class="slide-body">
+      <div class="formula">$A\cup B=\{x\mid x\in A\ \text{或}\ x\in B\}$（合并，自动去重）</div>
+      <div class="card"><b>例题：</b>$A=\{1,2,3\},\ B=\{3,4,5\}$，则 $A\cup B=\{1,2,3,4,5\}$</div>
+      <div class="deep">💡 性质：交换律 $A\cup B=B\cup A$ · 幂等 $A\cup A=A$ · $A\cup\emptyset=A$</div>
+    </div>
+  </section>
+
+  <!-- 11 补集 -->
+  <section class="slide" data-narration="第三种是补集，要先把全集 U 固定下来。A 在 U 中的补集，取属于 U 但不属于 A 的元素，也就是全集中挖掉 A 剩下的部分。比如 U 是由 1 到 5 的整数组成的集合，A 是由 1、3、5 组成的集合，补集就是由 2、4 组成的集合。补集三条性质很优美：补集的补集等于自己，也就是双重否定；A 并上它的补集等于全集，排中律；A 交上它的补集等于空集，矛盾律。">
+    <div class="slide-head"><span class="sec">五</span><h3>补集 $\complement_U A$</h3></div>
+    <div class="slide-body">
+      <div class="formula">$\complement_U A=\{x\mid x\in U\ \text{且}\ x\notin A\}$（全集中去掉 A）</div>
+      <div class="card"><b>例题：</b>$U=\{1,2,3,4,5\},\ A=\{1,3,5\}$，则 $\complement_U A=\{2,4\}$</div>
+      <div class="deep">💡 三重性质：① $\complement_U(\complement_U A)=A$（双重否定）② $A\cup\complement_U A=U$（排中）③ $A\cap\complement_U A=\emptyset$（矛盾）</div>
+    </div>
+  </section>
+
+  <!-- 12 Venn 图 -->
+  <section class="slide" data-narration="用韦恩图把这三种运算画出来，最直观。外面这个矩形是全集 U，里面两个圆分别是 A 和 B。两圆重叠的紫色区域，就是交集 A 交 B，公共部分。把两个圆全部涂上的区域，就是并集 A 并 B。而全集中圆外面、方框内的月牙形，就是 A 的补集，全集减去 A。画图能帮你秒判很多交并补的题，尤其是带参数的集合题，先画个圈往往就清楚了。">
+    <div class="slide-head"><span class="sec">五</span><h3>韦恩图 · 一眼看懂交并补</h3></div>
+    <div class="slide-body">
+      <div class="venn">
+        <svg viewBox="0 0 620 360" width="600" height="348">
+          <rect x="8" y="8" width="604" height="344" fill="none" stroke="#94a3b8" stroke-width="2" rx="12"/>
+          <text x="26" y="34" fill="#475569" font-size="19" font-weight="700">U 全集</text>
+          <circle cx="255" cy="195" r="115" fill="#4f46e5" fill-opacity="0.22" stroke="#4f46e5" stroke-width="2.5"/>
+          <text x="205" y="205" fill="#312e81" font-size="24" font-weight="700">A</text>
+          <circle cx="375" cy="195" r="115" fill="#e53e3e" fill-opacity="0.22" stroke="#e53e3e" stroke-width="2.5"/>
+          <text x="362" y="205" fill="#9b2c2c" font-size="24" font-weight="700">B</text>
+          <text x="300" y="165" fill="#312e81" font-size="19" font-weight="700">A∩B</text>
+          <text x="300" y="320" fill="#4f46e5" font-size="17" font-weight="700">A∪B：两圆全部区域</text>
+          <text x="500" y="200" fill="#dd6b20" font-size="16" font-weight="700" transform="rotate(90 500 200)">∁ᵤA</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13 德摩根定律 -->
+  <section class="slide" data-narration="德摩根定律，是集合运算里最重要的恒等式，也是高考常客。它说的是：A 并 B 的补集，等于 A 的补集交 B 的补集；A 交 B 的补集，等于 A 的补集并 B 的补集。怎么记？把补集想成取反，并和交就像逻辑里的『或』和『且』，取反时或变且、且变或，正好是德摩根。证明用韦恩图一眼可验证，也可以用元素法严格证明。">
+    <div class="slide-head"><span class="sec">五</span><h3>德摩根定律</h3></div>
+    <div class="slide-body">
+      <div class="formula">$\complement_U(A\cup B)=\complement_U A\cap\complement_U B$</div>
+      <div class="formula">$\complement_U(A\cap B)=\complement_U A\cup\complement_U B$</div>
+      <div class="tip">🧠 记忆法：补集＝取反，「或变且、且变或」——与逻辑的德摩根完全一致。</div>
+    </div>
+  </section>
+
+  <!-- 14 量词 -->
+  <section class="slide" data-narration="进入逻辑用语。两个量词符号要认识。全称量词，符号像一个倒写的 A，读『对任意』，表示所有、每一个，比如对任意实数 x，x 平方都大于等于 0。存在量词，符号像一个反写的 E，读『存在』，表示至少有一个，比如存在实数 x 使 x 平方等于 4。量词决定了命题的范围，后面判断充分必要条件时，尤其要注意量词和取值范围。">
+    <div class="slide-head"><span class="sec">六</span><h3>常用逻辑用语 · 量词</h3></div>
+    <div class="slide-body">
+      <div class="cols">
+        <div class="col">
+          <div class="card"><b>全称量词 $\forall$</b>——「对任意 / 所有 / 每一个」</div>
+          <div class="formula">$\forall x\in\mathbb{R},\ x^2\ge 0$</div>
+        </div>
+        <div class="col">
+          <div class="card"><b>存在量词 $\exists$</b>——「存在 / 至少有一个」</div>
+          <div class="formula">$\exists x\in\mathbb{R},\ x^2=4$</div>
+        </div>
+      </div>
+      <div class="deep">💡 量词决定命题的「范围」，判断条件时先看取值范围和量词。</div>
+    </div>
+  </section>
+
+  <!-- 15 充分必要条件 -->
+  <section class="slide" data-narration="充分必要条件，是集合章和逻辑里最易错也最关键的考点。p 推出 q，p 就是 q 的充分条件，q 是 p 的必要条件。如果 p 和 q 互推，就是充要条件。最实用的判断口诀是：小范围推大范围。只要 p 对应的集合是 q 对应集合的子集，p 就能推出 q。比如 x 大于 2 能推出 x 大于 1，所以 x 大于 2 是 x 大于 1 的充分不必要条件。集合视角能把抽象的『条件』变成看得见的包含关系。">
+    <div class="slide-head"><span class="sec">六</span><h3>充分条件与必要条件</h3></div>
+    <div class="slide-body">
+      <div class="formula">$p\Rightarrow q$：$p$ 是 $q$ 的<b>充分条件</b>，$q$ 是 $p$ 的<b>必要条件</b><br>$p\Leftrightarrow q$：互为<b>充要条件</b></div>
+      <div class="tip">🎯 核心口诀：<b>小范围推大范围</b> — 若 $P\subseteq Q$，则 $p\Rightarrow q$</div>
+      <table>
+        <thead><tr><th>条件</th><th>关系</th></tr></thead>
+        <tbody>
+          <tr><td>$x&gt;2$ 与 $x&gt;1$</td><td>充分不必要</td></tr>
+          <tr><td>$x^2=1$ 与 $x=1$</td><td>必要不充分</td></tr>
+          <tr><td>$x=2$ 与 $x^2=4$</td><td>充分不必要</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 16 四种命题 -->
+  <section class="slide" data-narration="一个命题若 p 则 q，可以变出四种。原命题若 p 则 q；逆命题若 q 则 p；否命题若非 p 则非 q；逆否命题若非 q 则非 p。最关键的一条结论：原命题和逆否命题同真同假。利用它，当原命题难证时，可以改证它的逆否命题。比如证明若 x 大于 2 则 x 大于 1，直接很明显，它的逆否命题若 x 不大于 1 则 x 不大于 2 也同样成立。">
+    <div class="slide-head"><span class="sec">六</span><h3>四种命题</h3></div>
+    <div class="slide-body">
+      <table>
+        <thead><tr><th>类型</th><th>形式</th><th>示例（x>2 ⇒ x>1）</th></tr></thead>
+        <tbody>
+          <tr><td>原命题</td><td>若 p，则 q</td><td>若 $x>2$，则 $x>1$</td></tr>
+          <tr><td>逆命题</td><td>若 q，则 p</td><td>若 $x>1$，则 $x>2$</td></tr>
+          <tr><td>否命题</td><td>若非 p，则非 q</td><td>若 $x\le 2$，则 $x\le 1$</td></tr>
+          <tr><td>逆否命题</td><td>若非 q，则非 p</td><td>若 $x\le 1$，则 $x\le 2$</td></tr>
+        </tbody>
+      </table>
+      <div class="deep">💡 关键结论：<b>原命题 ⇔ 逆否命题</b>（同真同假），难证原命题时可改证其逆否命题。</div>
+    </div>
+  </section>
+
+  <!-- 17 数学思想 -->
+  <section class="slide" data-narration="集合这一章，表面是符号，背后是数学思想。第一，分类与抽象：把有共同特征的对象归为一类，并忽略具体属性，只看是否满足规则——这是现代数学的基本功。第二，集合运算本质上就是逻辑运算：交集对应『且』，并集对应『或』，补集对应『非』。理解了这一层，集合和逻辑就打通了。第三，集合统一了有限和无限，自然数集和正整数集『一样大』，因为能一一对应。">
+    <div class="slide-head"><span class="sec">七</span><h3>数学思想 · 底层逻辑</h3></div>
+    <div class="slide-body">
+      <table>
+        <thead><tr><th>集合运算</th><th>逻辑运算</th><th>自然语言</th></tr></thead>
+        <tbody>
+          <tr><td>$A\cap B$</td><td>$p\land q$</td><td>既…又…</td></tr>
+          <tr><td>$A\cup B$</td><td>$p\lor q$</td><td>或…或…</td></tr>
+          <tr><td>$\complement_U A$</td><td>$\neg p$</td><td>非…</td></tr>
+        </tbody>
+      </table>
+      <div class="card"><b>两条底层思想</b>：① 分类与抽象——按特征归类、忽略具体属性；② 集合统一有限与无限（$|\mathbb{N}|=|\mathbb{N}^*|$ 可一一对应）。</div>
+    </div>
+  </section>
+
+  <!-- 18 典型例题串讲 -->
+  <section class="slide" data-narration="串一道综合题。设 A 是 x 满足负 2 小于 x 小于 3，B 是 x 满足 x 小于负 1 或者 x 大于 4，求 A 交 B。这类题最稳的办法是画数轴。A 是负 2 到 3 的开区间，B 是负无穷到负 1 并上 4 到正无穷。两区间取公共部分，只有负 2 到负 1 这一段重叠，所以交集是 x 满足负 2 小于 x 小于负 1。带参数的集合题、集合与不等式的题，一律先画数轴，最不容易漏。">
+    <div class="slide-head"><span class="sec">八</span><h3>典型例题 · 集合与不等式</h3></div>
+    <div class="slide-body">
+      <p><b>已知</b> $A=\{x\mid -2&lt;x&lt;3\}$，$B=\{x\mid x&lt;-1\ \text{ 或 }\ x&gt;4\}$，求 $A\cap B$。</p>
+      <div class="formula">画数轴取公共部分 → $A\cap B=\{x\mid -2&lt;x&lt;-1\}$</div>
+      <svg viewBox="0 0 760 190" style="width:100%;max-width:760px;display:block;margin:10px auto 0;background:var(--bg-light);border-radius:10px;">
+        <defs>
+          <marker id="arrow-r" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 L0,0" fill="#475569"/></marker>
+          <marker id="arrow-l" markerWidth="8" markerHeight="8" refX="1" refY="4" orient="auto"><path d="M8,0 L0,4 L8,8 L8,0" fill="#475569"/></marker>
+        </defs>
+        <!-- 刻度与数字 -->
+        <g font-family="system-ui, -apple-system, sans-serif" font-size="15" fill="#475569" text-anchor="middle">
+          <text x="70" y="28">-3</text><text x="130" y="28">-2</text><text x="190" y="28">-1</text>
+          <text x="250" y="28">0</text><text x="310" y="28">1</text><text x="370" y="28">2</text>
+          <text x="430" y="28">3</text><text x="490" y="28">4</text><text x="550" y="28">5</text>
+        </g>
+        <g stroke="#94a3b8" stroke-width="1.5">
+          <line x1="70" y1="35" x2="70" y2="45"/><line x1="130" y1="35" x2="130" y2="45"/>
+          <line x1="190" y1="35" x2="190" y2="45"/><line x1="250" y1="35" x2="250" y2="45"/>
+          <line x1="310" y1="35" x2="310" y2="45"/><line x1="370" y1="35" x2="370" y2="45"/>
+          <line x1="430" y1="35" x2="430" y2="45"/><line x1="490" y1="35" x2="490" y2="45"/>
+          <line x1="550" y1="35" x2="550" y2="45"/>
+        </g>
+        <!-- 主线 -->
+        <line x1="40" y1="40" x2="580" y2="40" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow-r)"/>
+
+        <!-- A: (-2,3) -->
+        <g>
+          <line x1="130" y1="70" x2="430" y2="70" stroke="#4f46e5" stroke-width="3"/>
+          <circle cx="130" cy="70" r="4.5" fill="#fff" stroke="#4f46e5" stroke-width="2.5"/>
+          <circle cx="430" cy="70" r="4.5" fill="#fff" stroke="#4f46e5" stroke-width="2.5"/>
+          <text x="600" y="75" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#334155">A (-2, 3)</text>
+        </g>
+
+        <!-- B: (-∞,-1) ∪ (4,+∞) -->
+        <g>
+          <line x1="55" y1="105" x2="190" y2="105" stroke="#ef4444" stroke-width="3" marker-start="url(#arrow-l)"/>
+          <circle cx="190" cy="105" r="4.5" fill="#fff" stroke="#ef4444" stroke-width="2.5"/>
+          <line x1="490" y1="105" x2="580" y2="105" stroke="#ef4444" stroke-width="3" marker-end="url(#arrow-r)"/>
+          <circle cx="490" cy="105" r="4.5" fill="#fff" stroke="#ef4444" stroke-width="2.5"/>
+          <text x="600" y="110" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#334155">B (-∞,-1) ∪ (4,+∞)</text>
+        </g>
+
+        <!-- 交集: (-2,-1) -->
+        <g>
+          <line x1="130" y1="145" x2="190" y2="145" stroke="#10b981" stroke-width="4"/>
+          <circle cx="130" cy="145" r="5" fill="#fff" stroke="#10b981" stroke-width="2.5"/>
+          <circle cx="190" cy="145" r="5" fill="#fff" stroke="#10b981" stroke-width="2.5"/>
+          <text x="600" y="150" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#334155" font-weight="600">交集 (-2, -1)</text>
+        </g>
+      </svg>
+      <div class="tip">📐 集合与不等式综合题：先画数轴，再取公共 / 合并部分，最稳。</div>
+    </div>
+  </section>
+
+  <!-- 19 易错点 -->
+  <section class="slide" data-narration="集合章有三大易错点，务必贴在书桌前。第一，空集的特殊性：A 交 B 等于空集，不代表 A B 都空；含参数的集合题，一定先讨论空集情况。第二，补集的全集：题目没明说时，全集往往隐含，比如默认实数集，算补集前先确认 U 是什么。第三，充分必要条件：严格用『小范围推大范围』判断，别凭语感；p 是 q 的什么条件，看的是 p 推不推 q，不是反过来。">
+    <div class="slide-head"><span class="sec">易错</span><h3>三大易错点</h3></div>
+    <div class="slide-body">
+      <table>
+        <thead><tr><th>序号</th><th>易错点</th><th>正确做法</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>空集的特殊性</td><td>$A\cap B=\emptyset$ 不代表 A、B 都空；含参数题先讨论空集</td></tr>
+          <tr><td>2</td><td>补集的全集</td><td>算补集前先确认全集 U（常隐含为 $\mathbb{R}$）</td></tr>
+          <tr><td>3</td><td>充分必要条件</td><td>严格用「小范围推大范围」；看 $p\Rightarrow q$ 而非反过来</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 20 高考考法 -->
+  <section class="slide" data-narration="最后说高考怎么考。集合单独占分不多，一般 5 到 10 分，常出现在选择题前两题或填空第一题，难度为基础或中档，几乎不当压轴。但它极容易和不等式、函数定义域结合考。结论很明确：集合本身不是拉分点，目标是确保不丢分。每天限时做三五道集合选择题保持手感，把空集、全集、充分必要这三类坑清干净，这章就稳了。">
+    <div class="slide-head"><span class="sec">定位</span><h3>高考怎么考 · 行动建议</h3></div>
+    <div class="slide-body">
+      <table>
+        <thead><tr><th>维度</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td>分值占比</td><td>5–10 分（约 3%–7%），常在前 3 题</td></tr>
+          <tr><td>难度级别</td><td>基础 / 中档，极少压轴</td></tr>
+          <tr><td>考查形式</td><td>单一考点，或与不等式、函数定义域结合</td></tr>
+        </tbody>
+      </table>
+      <div class="deep">💡 目标：确保不丢分。每天限时 3–5 道集合选择题；清空「空集 / 全集 / 充分必要」三类坑。</div>
+    </div>
+  </section>
+
+  <!-- 21 通关清单 + 结尾 -->
+  <section class="slide slide-cover" data-narration="到这里，集合整章就复习完了。给你一份通关清单，合上书自测：常用数集和包含关系，能不能脱口而出？子集个数公式 2 的 n 次方，记牢了吗？交并补和德摩根，能不能画出韦恩图？充分必要条件，会不会用『小范围推大范围』？三大易错点，每次做题前扫一眼了吗？如果哪条还卡，回到对应页再推一遍。真正吃透集合，你后面的函数、不等式、概率都会顺很多。加油！">
+    <div class="kicker">复 习 通 关 清 单</div>
+    <h1 style="font-size:46px">你能独立做到吗？</h1>
+    <div class="divider"></div>
+    <div class="meta" style="text-align:left; max-width:780px; line-height:2.1;">
+      ☑ 常用数集与包含关系，脱口而出<br>
+      ☑ 子集个数公式 $2^n$ 与 $2^n-1$，记牢<br>
+      ☑ 交并补 + 德摩根，能画韦恩图<br>
+      ☑ 充分必要条件，会用「小范围推大范围」<br>
+      ☑ 三大易错点（空集 / 全集 / 充分必要），每次扫一眼
+    </div>
+    <div class="divider" style="margin-top:26px"></div>
+    <div class="meta">真正吃透集合，函数、不等式、概率都会顺很多。加油！</div>
+  </section>
+
+  <!-- 页脚 -->
+  <div id="footer">
+    <span class="brand">集合复习讲解</span>
+    <span id="pagenum">1 / 22</span>
+  </div>
+
+  <!-- 导航 -->
+  <div class="nav">
+    <button id="prev" title="上一页 (←)">‹</button>
+    <button id="next" title="下一页 (→ / 空格)">›</button>
+  </div>
+  <div id="hint">← → 翻页 · 空格下一页 · 点击左右半屏翻页</div>
+
+</div>
+
+<script>
+(function(){
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  let idx = 0;
+
+  const params = new URLSearchParams(location.search);
+  const startSlide = parseInt(params.get('slide'), 10);
+  if (params.get('autohide') === '1') document.body.classList.add('autohide');
+  if (!isNaN(startSlide) && startSlide >= 1 && startSlide <= total) idx = startSlide - 1;
+
+  const progress = document.getElementById('progress');
+  const pagenum = document.getElementById('pagenum');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+
+  function render(){
+    slides.forEach((s,i)=> s.classList.toggle('active', i===idx));
+    progress.style.width = ((idx+1)/total*100) + '%';
+    pagenum.textContent = (idx+1) + ' / ' + total;
+    prevBtn.disabled = (idx===0);
+    nextBtn.disabled = (idx===total-1);
+  }
+  function go(n){ idx = Math.max(0, Math.min(total-1, n)); render(); }
+
+  prevBtn.addEventListener('click', e=>{ e.stopPropagation(); go(idx-1); });
+  nextBtn.addEventListener('click', e=>{ e.stopPropagation(); go(idx+1); });
+
+  document.addEventListener('keydown', e=>{
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){ e.preventDefault(); go(idx+1); }
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); go(idx-1); }
+    else if(e.key==='Home'){ go(0); }
+    else if(e.key==='End'){ go(total-1); }
+  });
+
+  document.getElementById('stage').addEventListener('click', e=>{
+    if(e.target.closest('.nav')) return;
+    const x = e.clientX;
+    if(x < window.innerWidth*0.5) go(idx-1); else go(idx+1);
+  });
+
+  function fit(){
+    const s = Math.min(window.innerWidth/1280, window.innerHeight/720);
+    document.getElementById('stage').style.transform = 'translate(-50%,-50%) scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+  render();
+})();
+</script>
+</body>
+</html>
